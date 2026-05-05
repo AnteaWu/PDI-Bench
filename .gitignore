@@ -51,4 +51,7 @@ data/1s.mp4
 !/*/
 !/.gitignore
 !/README.md
+!/camera_objects.json
+!/camera_prompts.json
 
+/humanstudy/

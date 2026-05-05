@@ -1,9 +1,0 @@
-A camera following directly behind a blue delivery truck driving on a straight desert highway. The camera moves at the exact same speed as the truck, keeping the distance between them constant. The truck occupies the center 50% of the frame. The road markings and desert bushes on the side rush past quickly due to speed, creating a strong motion blur effect on the periphery, while the back of the truck remains sharp and static in size. Golden hour lighting, cinematic, 4k, 24fps, 6 seconds.
-
-The red electric locomotive at the station slowly moves forward along the tracks, with the camera following smoothly. Keep the original overcast, misty atmosphere and color scheme. 24fps, 6 seconds.
-
-A basketball rolling straight away from the camera down the center of an infinite gallery. The floor is covered in a high-contrast black and white checkerboard pattern that extends to the vanishing point. The camera remains static at a low angle.  Soft, even lighting, photorealistic, 4k, 24fps, 6 seconds.
-
-A person walking straight away from the camera down a long, empty hallway, starting from a close-up shot until they become a small silhouette. Soft, even lighting, photorealistic, 4k, 24fps, 6 seconds.
-
-A red sports car driving towards the camera on a straight desert highway, starting as a dot on the horizon and ending with a close-up of the bumper. Soft, even lighting, photorealistic, 4k, 24fps, 6 seconds.
