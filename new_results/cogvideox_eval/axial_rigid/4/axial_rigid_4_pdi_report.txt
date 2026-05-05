@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/4
+Video:     /data/xueyanz/code/PDI-Bench/videos/cogvideoX/axial_rigid/4/silver metallic sphere.mp4
+GPU:       7
+Prompt:    silver metallic sphere
+--------------------------------------------------
+FINAL PDI SCORE: 0.1147
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0133
+ - Trajectory Component (H-X):     0.2357
+ - Rigidity Component (Stability): 0.1451
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/cogvideox_eval/axial_rigid/4
+==================================================

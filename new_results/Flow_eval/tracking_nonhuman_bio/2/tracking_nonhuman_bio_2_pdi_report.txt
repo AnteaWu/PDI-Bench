@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  tracking_nonhuman_bio/2
+Video:     /data/xueyanz/code/PDI-Bench/videos/camera_video/Flow/tracking_nonhuman_bio/2/A_smooth_following_shot_of_an_autonomous_suitcase__a01ce440db.mp4
+GPU:       5
+Prompt:    autonomous suitcase
+--------------------------------------------------
+FINAL PDI SCORE: 0.0774
+OVERALL GRADE:   A (Physical Realism) - 物理逻辑严丝合缝
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0528
+ - Trajectory Component (H-X):     0.1806
+ - Rigidity Component (Stability): 0.0081
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.9362
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/Flow_eval/tracking_nonhuman_bio/2
+==================================================

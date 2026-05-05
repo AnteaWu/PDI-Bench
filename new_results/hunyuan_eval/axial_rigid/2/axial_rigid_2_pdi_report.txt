@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/2
+Video:     /data/xueyanz/code/PDI-Bench/hunyuan/axial_rigid/2/2026-03-02-02-13-28_seed42_A high-speed train moving toward the viewer on a straight track, low-angle handheld perspective, rai.mp4
+GPU:       5
+Prompt:    high-speed train
+--------------------------------------------------
+FINAL PDI SCORE: 0.0597
+OVERALL GRADE:   A (Physical Realism) - 物理逻辑严丝合缝
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0140
+ - Trajectory Component (H-X):     0.1543
+ - Rigidity Component (Stability): 0.0320
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/hunyuan_eval/axial_rigid/2
+==================================================

@@ -9,15 +9,16 @@ data/
 # 2. 数据与结果
 output/
 debug_results/
-results/
+new_results/
+humanstudy/
+visualization/
 *.mp4
 *.jpg
 *.png
 *.npz
 *.npy
-DAVIS/
-hunyuan/
-cogvideoX/
+*.csv
+videos/
 test_lietorch.py
 test.py
 testing.py
@@ -25,10 +26,15 @@ cotracker_check.py
 sam2_check.py
 debug_results/
 debug_sam2.py
+sam2_check.py
+camera.md
 paper.tex
 allpdi/
 pdi_recalculate.py
 plot_pdi.py
+1.py
+analyze_model_evaluation.py
+app.py
 
 # 3. 系统与环境
 __pycache__/
@@ -39,4 +45,10 @@ __pycache__/
 env/data/1s.mp4
 data/1s.mp4
 
+
+# 4. 忽略根目录下的所有文件（保留子文件夹）
+/*
+!/*/
+!/.gitignore
+!/README.md
 

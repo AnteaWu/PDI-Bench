@@ -1,0 +1,27 @@
+Traceback (most recent call last):
+  File "/data/xueyanz/code/PDI-Bench/evaluation/evaluation_seedance.py", line 88, in _run_sequence
+    report = pipeline.run(video_path=video_path, text_query=text_query, render_output_dir=str(seq_out))
+  File "/data/xueyanz/code/PDI-Bench/src/pdi_eval/pipeline.py", line 45, in run
+    res_2d_raw = sam.infer(video_path, click_points=click_points, text_query=text_query, box_prompt=box_prompt)
+  File "/data/xueyanz/code/PDI-Bench/src/pdi_eval/perception/sam_wrapper.py", line 148, in infer
+    click_points, box_np = self._auto_detect(frame, text_query)
+  File "/data/xueyanz/code/PDI-Bench/src/pdi_eval/perception/sam_wrapper.py", line 93, in _auto_detect
+    self._init_detector()
+  File "/data/xueyanz/code/PDI-Bench/src/pdi_eval/perception/sam_wrapper.py", line 89, in _init_detector
+    ).to(self.device).eval()
+  File "/data/xueyanz/miniconda/envs/mega_sam/lib/python3.10/site-packages/transformers/modeling_utils.py", line 2724, in to
+    return super().to(*args, **kwargs)
+  File "/data/xueyanz/miniconda/envs/mega_sam/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1160, in to
+    return self._apply(convert)
+  File "/data/xueyanz/miniconda/envs/mega_sam/lib/python3.10/site-packages/torch/nn/modules/module.py", line 810, in _apply
+    module._apply(fn)
+  File "/data/xueyanz/miniconda/envs/mega_sam/lib/python3.10/site-packages/torch/nn/modules/module.py", line 810, in _apply
+    module._apply(fn)
+  File "/data/xueyanz/miniconda/envs/mega_sam/lib/python3.10/site-packages/torch/nn/modules/module.py", line 810, in _apply
+    module._apply(fn)
+  [Previous line repeated 6 more times]
+  File "/data/xueyanz/miniconda/envs/mega_sam/lib/python3.10/site-packages/torch/nn/modules/module.py", line 833, in _apply
+    param_applied = fn(param)
+  File "/data/xueyanz/miniconda/envs/mega_sam/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1158, in convert
+    return t.to(device, dtype if t.is_floating_point() or t.is_complex() else None, non_blocking)
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacty of 23.68 GiB of which 9.88 MiB is free. Including non-PyTorch memory, this process has 1.38 GiB memory in use. Process 2348155 has 7.80 GiB memory in use. Process 2487997 has 14.48 GiB memory in use. Of the allocated memory 1.06 GiB is allocated by PyTorch, and 5.38 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF

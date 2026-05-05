@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  dolly_zoom/4
+Video:     /data/xueyanz/code/PDI-Bench/videos/camera_video/Flow/dolly_zoom/4/Lighthouse_by_the_sea_696cc2a4bc.mp4
+GPU:       5
+Prompt:    lighthouse
+--------------------------------------------------
+FINAL PDI SCORE: 0.1278
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0509
+ - Trajectory Component (H-X):     0.3651
+ - Rigidity Component (Stability): 0.0000
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.9902
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/Flow_eval/dolly_zoom/4
+==================================================

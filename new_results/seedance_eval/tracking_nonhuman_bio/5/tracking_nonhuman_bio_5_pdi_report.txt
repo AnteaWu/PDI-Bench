@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  tracking_nonhuman_bio/5
+Video:     /data/xueyanz/code/PDI-Bench/videos/seedance/tracking_nonhuman_bio/5/metal logistics crate.mp4
+GPU:       6
+Prompt:    metal logistics crate
+--------------------------------------------------
+FINAL PDI SCORE: 0.8035
+OVERALL GRADE:   F (Geometric Failure) - 物理逻辑彻底崩溃
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      1.0313
+ - Trajectory Component (H-X):     0.2761
+ - Rigidity Component (Stability): 1.0000
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.5474
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/seedance_eval/tracking_nonhuman_bio/5
+==================================================

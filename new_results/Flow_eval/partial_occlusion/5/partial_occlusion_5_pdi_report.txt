@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  partial_occlusion/5
+Video:     /data/xueyanz/code/PDI-Bench/videos/camera_video/Flow/partial_occlusion/5/Boat_sailing_behind_pier_fc5c255c9f.mp4
+GPU:       6
+Prompt:    boat
+--------------------------------------------------
+FINAL PDI SCORE: 0.1282
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.1699
+ - Trajectory Component (H-X):     0.1676
+ - Rigidity Component (Stability): 0.0233
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.1505
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/Flow_eval/partial_occlusion/5
+==================================================

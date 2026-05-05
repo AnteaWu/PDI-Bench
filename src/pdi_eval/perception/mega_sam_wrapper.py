@@ -1,6 +1,7 @@
 import subprocess
 import os
 import sys
+import glob
 import cv2
 import numpy as np
 import torch
@@ -24,7 +25,10 @@ def _masks_to_h_pixel_x_center(masks: np.ndarray):
     return np.array(h_list, dtype=np.float64), np.array(x_list, dtype=np.float64)
 
 def _extract_frames(video_path: str, out_dir: str) -> int:
-    """视频抽帧，统一为 6 位编号"""
+    """视频抽帧，统一为 6 位编号。先清空目录避免旧帧残留。"""
+    if os.path.isdir(out_dir):
+        for f in glob.glob(os.path.join(out_dir, "*.jpg")) + glob.glob(os.path.join(out_dir, "*.png")):
+            os.remove(f)
     os.makedirs(out_dir, exist_ok=True)
     cap = cv2.VideoCapture(video_path)
     count = 0
@@ -108,11 +112,16 @@ class MegaSamWrapper(BasePerceptor):
         n_frames = _extract_frames(video_path, frames_dir)
         if n_frames == 0: return self._fallback_result(video_path, masks)
 
-        # 路径对齐
+        # 路径对齐，清空旧深度图避免帧数不一致时残留文件污染
         mono_depth_base = os.path.join(work, "da_depth")
         da_out_dir = os.path.join(mono_depth_base, video_id)
         metric_depth_base = os.path.join(work, "unidepth")
-        
+        metric_out_dir = os.path.join(metric_depth_base, video_id)
+
+        for d, pat in [(da_out_dir, "*.npy"), (metric_out_dir, "*.npz")]:
+            if os.path.isdir(d):
+                for f in glob.glob(os.path.join(d, pat)):
+                    os.remove(f)
         os.makedirs(da_out_dir, exist_ok=True)
         os.makedirs(metric_depth_base, exist_ok=True)
         env = self._mega_sam_env()

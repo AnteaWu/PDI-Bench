@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/6
+Video:     /data/xueyanz/code/PDI-Bench/videos/cogvideoX/axial_rigid/6/large shipping container.mp4
+GPU:       5
+Prompt:    large shipping container
+--------------------------------------------------
+FINAL PDI SCORE: 0.0692
+OVERALL GRADE:   A (Physical Realism) - 物理逻辑严丝合缝
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0368
+ - Trajectory Component (H-X):     0.1784
+ - Rigidity Component (Stability): 0.0059
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0006
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/cogvideox_eval/axial_rigid/6
+==================================================

@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  orbital_rotation/1
+Video:     /data/xueyanz/code/PDI-Bench/videos/cogvideoX/orbital_rotation/1/silver compact SUV.mp4
+GPU:       7
+Prompt:    silver compact SUV
+--------------------------------------------------
+FINAL PDI SCORE: 0.4273
+OVERALL GRADE:   C (Obvious Distortion) - 明显透视幻觉/滑步
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.4121
+ - Trajectory Component (H-X):     0.2429
+ - Rigidity Component (Stability): 0.6415
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.2622
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/cogvideox_eval/orbital_rotation/1
+==================================================

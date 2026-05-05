@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/6
+Video:     /data/xueyanz/code/PDI-Bench/videos/self-forcing/axial_rigid/6/large shipping container.mp4
+GPU:       4
+Prompt:    large shipping container
+--------------------------------------------------
+FINAL PDI SCORE: 1.9941
+OVERALL GRADE:   F (Geometric Failure) - 物理逻辑彻底崩溃
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      4.6060
+ - Trajectory Component (H-X):     0.2728
+ - Rigidity Component (Stability): 0.2128
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0019
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/self_forcing_eval/axial_rigid/6
+==================================================

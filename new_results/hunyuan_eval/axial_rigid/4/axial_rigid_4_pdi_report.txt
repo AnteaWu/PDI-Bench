@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/4
+Video:     /data/xueyanz/code/PDI-Bench/hunyuan/axial_rigid/4/2026-03-02-02-40-30_seed42_A silver metallic sphere rolling away on a long reflective marble floor in a bright gallery, the sho.mp4
+GPU:       7
+Prompt:    silver metallic sphere
+--------------------------------------------------
+FINAL PDI SCORE: 0.1302
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0936
+ - Trajectory Component (H-X):     0.1883
+ - Rigidity Component (Stability): 0.1263
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.3306
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/hunyuan_eval/axial_rigid/4
+==================================================

@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  nonrigid_nonhuman_bio/1
+Video:     /data/xueyanz/code/PDI-Bench/wan22/nonrigid_nonhuman_bio/1/2026-03-03-06-21-45_seed42_A_smooth_following_shot_of_a_large_eagle_flying_at_high_speed_parallel_to_a_cliff,_rock_face_and_sea.mp4
+GPU:       6
+Prompt:    large eagle
+--------------------------------------------------
+FINAL PDI SCORE: 0.4204
+OVERALL GRADE:   C (Obvious Distortion) - 明显透视幻觉/滑步
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.8534
+ - Trajectory Component (H-X):     0.1049
+ - Rigidity Component (Stability): 0.0823
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/wan22_eval/nonrigid_nonhuman_bio/1
+==================================================

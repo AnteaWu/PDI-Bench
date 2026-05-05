@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  orbital_rotation/1
+Video:     /data/xueyanz/code/PDI-Bench/wan22/orbital_rotation/1/2026-03-03-07-28-44_seed42_A_handheld_tracking_perspective_follows_a_silver_compact_SUV_navigating_a_sharp_hairpin_turn_on_a_wi.mp4
+GPU:       7
+Prompt:    silver compact SUV
+--------------------------------------------------
+FINAL PDI SCORE: 0.4186
+OVERALL GRADE:   C (Obvious Distortion) - 明显透视幻觉/滑步
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.6216
+ - Trajectory Component (H-X):     0.2149
+ - Rigidity Component (Stability): 0.3177
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/wan22_eval/orbital_rotation/1
+==================================================

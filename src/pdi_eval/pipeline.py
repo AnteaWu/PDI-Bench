@@ -11,7 +11,7 @@ from .perception.track_wrapper import TrackWrapper
 from .perception.mega_sam_wrapper import MegaSamWrapper
 from .geometry.camera import CameraModel
 from .geometry.projection import ProjectionJudge
-from .evaluator.motion_audit import audit_trajectory_consistency
+from .evaluator.motion_audit import audit_trajectory_consistency, audit_3d_trajectory_consistency
 from .evaluator.scale_audit import audit_scale_consistency
 from .evaluator.volume_audit import audit_3d_volume_stability
 from .evaluator.reconstruction_audit import audit_reconstruction
@@ -31,7 +31,7 @@ class PDIEvaluationPipeline:
         self.last_masks = None
         self.last_pointmaps = None
 
-    def run(self, video_path: str, click_points: Optional[list] = None, text_query: Optional[str] = None, render_output_dir: Optional[str] = None) -> Dict[str, Any]:
+    def run(self, video_path: str, click_points: Optional[list] = None, text_query: Optional[str] = None, box_prompt: Optional[list] = None, render_output_dir: Optional[str] = None) -> Dict[str, Any]:
         self.video_path = video_path
         self.video_id = Path(video_path).stem
         pdi_logger.info(f"--- [bold blue]PDI-Eval Pipeline Start: {self.video_id}[/bold blue] ---")
@@ -42,7 +42,7 @@ class PDIEvaluationPipeline:
             res_2d = self.cache.load_step(self.video_id, "sam2")
         else:
             sam = Sam2Wrapper(checkpoint=self.config['sam_ckpt'], config=self.config.get('sam_cfg'))
-            res_2d_raw = sam.infer(video_path, click_points=click_points, text_query=text_query)
+            res_2d_raw = sam.infer(video_path, click_points=click_points, text_query=text_query, box_prompt=box_prompt)
             self.cache.save_step(self.video_id, "sam2", {
                 "masks": res_2d_raw.masks,
                 "h_pixel": res_2d_raw.h_pixel,
@@ -120,8 +120,10 @@ class PDIEvaluationPipeline:
         bg_tracks_raw = res_tracks.get('bg_tracks', np.empty((0, 0, 2)))
         bg_tracks_NTD = bg_tracks_raw.transpose(1, 0, 2) if bg_tracks_raw.ndim == 3 and bg_tracks_raw.shape[0] > 0 else None
 
-        # 读取首帧用于 LSD 背景线检测
+        # 读取首帧用于 LSD 背景线检测，同时获取视频帧率
         _cap = cv2.VideoCapture(video_path)
+        _video_fps = _cap.get(cv2.CAP_PROP_FPS)
+        video_fps = float(_video_fps) if _video_fps > 0 else 24.0
         _first_frames = []
         for _ in range(min(3, int(_cap.get(cv2.CAP_PROP_FRAME_COUNT)))):
             ret, _f = _cap.read()
@@ -188,32 +190,19 @@ class PDIEvaluationPipeline:
         # 4.1 尺度审计 (h * z)
         eps_scale_seq = audit_scale_consistency(h_pixel_use, z_aligned_use)
 
-        # 4.2 广义轨迹审计 (VP-Driven 取代中心点假设)
-        # 使用 Co-Tracker 所有点的均值质心 (T, 2)
-        stable_xy_seq = np.mean(tracks_use, axis=1)   # (T_use, 2)
+        # 4.2 3D 运动学轨迹审计
+        # 优先用 MegaSAM 世界坐标系点图直接审查 3D 质心轨迹的物理平滑性，
+        # 彻底解耦 h_pixel，免疫动镜头，兼容直线与曲线运动。
+        # pointmaps 全零（MegaSAM fallback）时函数内部自动返回零序列。
+        eps_traj_seq = audit_3d_trajectory_consistency(pointmaps_use, masks_use, fps=video_fps)
 
-        eps_traj_seq = audit_trajectory_consistency(h_pixel_use, stable_xy_seq, vp)
-
-        # 旋转自适应修正：2D VP 模型仅对质心平移有效。
-        # 当 2D 轨迹残差远超 3D 尺度残差（>5x）时，说明 H-VP 齐次性公式失效——
-        # 物体处于旋转/大姿态变换场景而非平移，此时 traj 不具备 AI 检测意义。
-        # 降级为 scale_mean * 1.5，保留轻微惩罚但避免数值爆炸。
-        avg_scale = float(np.mean(eps_scale_seq)) if len(eps_scale_seq) > 0 else 0.0
-        avg_traj  = float(np.mean(eps_traj_seq))  if len(eps_traj_seq)  > 0 else 0.0
-        if avg_scale > 1e-6 and avg_traj > 5.0 * avg_scale:
-            corrected = avg_scale * 1.5
-            pdi_logger.info(
-                f"旋转自适应修正: traj={avg_traj:.4f} >> scale={avg_scale:.4f}, "
-                f"修正 traj → {corrected:.4f}"
-            )
-            eps_traj_seq = np.full_like(eps_traj_seq, corrected)
-
-        # 4.3 体积/刚性审计（优先刚性稳定性，fallback 3D 点云）
-        vol_cv, vol_history = audit_3d_volume_stability(
+        # 4.3 体积/刚性审计
+        vol_cv, vol_history, rigidity_strategy = audit_3d_volume_stability(
             pointmaps_use,
             masks_use,
             tracks=tracks_use,
             h_seq=h_pixel_use,
+            visibility=res_tracks['visibility'][:T_use]
         )
 
         # 5. Metrics Synthesis
@@ -233,6 +222,7 @@ class PDIEvaluationPipeline:
             'scale_history': eps_scale_seq,
             'traj_history': eps_traj_seq,
             'volume_history': vol_history,
+            'rigidity_strategy': rigidity_strategy,
         })
         final_report['vanishing_point'] = global_vp
         final_report['fg_vp'] = fg_vp

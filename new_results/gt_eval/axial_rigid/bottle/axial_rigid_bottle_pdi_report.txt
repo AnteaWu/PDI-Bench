@@ -1,0 +1,25 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/bottle
+Video:     /data/xueyanz/code/PDI-Bench/videos/GT/axial_rigid/bottle.mp4
+GPU:       5
+--------------------------------------------------
+FINAL PDI SCORE: 0.0837
+OVERALL GRADE:   A (Physical Realism) - 物理逻辑严丝合缝
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0032
+ - Trajectory Component (H-X):     0.1566
+ - Rigidity Component (Stability): 0.0986
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0254
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/gt_eval/axial_rigid/bottle
+==================================================

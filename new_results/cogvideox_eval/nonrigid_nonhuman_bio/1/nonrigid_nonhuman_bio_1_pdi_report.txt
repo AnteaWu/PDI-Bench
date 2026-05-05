@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  nonrigid_nonhuman_bio/1
+Video:     /data/xueyanz/code/PDI-Bench/videos/cogvideoX/nonrigid_nonhuman_bio/1/large eagle.mp4
+GPU:       6
+Prompt:    large eagle
+--------------------------------------------------
+FINAL PDI SCORE: 0.3768
+OVERALL GRADE:   C (Obvious Distortion) - 明显透视幻觉/滑步
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.7004
+ - Trajectory Component (H-X):     0.2609
+ - Rigidity Component (Stability): 0.0000
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.9807
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/cogvideox_eval/nonrigid_nonhuman_bio/1
+==================================================

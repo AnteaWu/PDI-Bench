@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  partial_occlusion/6
+Video:     /data/xueyanz/code/PDI-Bench/videos/self-forcing/partial_occlusion/6/robot crate.mp4
+GPU:       5
+Prompt:    robot crate
+--------------------------------------------------
+FINAL PDI SCORE: 1.8939
+OVERALL GRADE:   F (Geometric Failure) - 物理逻辑彻底崩溃
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      3.9159
+ - Trajectory Component (H-X):     0.3188
+ - Rigidity Component (Stability): 1.0000
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/self_forcing_eval/partial_occlusion/6
+==================================================

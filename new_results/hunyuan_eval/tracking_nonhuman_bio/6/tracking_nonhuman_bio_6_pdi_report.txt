@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  tracking_nonhuman_bio/6
+Video:     /data/xueyanz/code/PDI-Bench/hunyuan/tracking_nonhuman_bio/6/2026-03-02-04-28-38_seed42_A handheld following shot of a large metal ball rolling through a straight modern art gallery, surro.mp4
+GPU:       5
+Prompt:    large metal ball
+--------------------------------------------------
+FINAL PDI SCORE: 0.1592
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.1873
+ - Trajectory Component (H-X):     0.1593
+ - Rigidity Component (Stability): 0.1160
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/hunyuan_eval/tracking_nonhuman_bio/6
+==================================================

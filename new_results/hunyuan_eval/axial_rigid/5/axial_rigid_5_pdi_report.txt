@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/5
+Video:     /data/xueyanz/code/PDI-Bench/hunyuan/axial_rigid/5/2026-03-02-02-54-01_seed42_A heavy cargo truck moving away on a straight bridge at night, tail lights glowing, subtle frame sha.mp4
+GPU:       4
+Prompt:    heavy cargo truck
+--------------------------------------------------
+FINAL PDI SCORE: 0.1357
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.1518
+ - Trajectory Component (H-X):     0.1394
+ - Rigidity Component (Stability): 0.1072
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.5836
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/hunyuan_eval/axial_rigid/5
+==================================================

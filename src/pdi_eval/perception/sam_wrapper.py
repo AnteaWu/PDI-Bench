@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import cv2
 import os
+from pathlib import Path
 from .base import BasePerceptor, PerceptionResult
 from typing import List, Tuple, Optional, Any
 from PIL import Image
@@ -87,10 +88,10 @@ class Sam2Wrapper(BasePerceptor):
                     torch_dtype=torch.float16 if self.device.type == "cuda" else torch.float32
                 ).to(self.device).eval()
 
-    def _auto_detect(self, first_frame_path: str, text_query: str) -> np.ndarray:
-        """使用 Florence-2 自动获取物体中心点"""
+    def _auto_detect(self, frame_bgr: np.ndarray, text_query: str) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+        """使用 Florence-2 自动获取物体中心点或 Bounding Box，直接接受 BGR numpy 帧，无需写临时文件"""
         self._init_detector()
-        image = Image.open(first_frame_path).convert("RGB")
+        image = Image.fromarray(cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB))
         
         # 构造检测指令：在图中寻找特定的物体
         prompt = f"<CAPTION_TO_PHRASE_GROUNDING>{text_query}"
@@ -113,50 +114,56 @@ class Sam2Wrapper(BasePerceptor):
         try:
             boxes = parsed_answer["<CAPTION_TO_PHRASE_GROUNDING>"]["bboxes"]
             if len(boxes) > 0:
-                box = boxes[0] # [x1, y1, x2, y2]
-                center_x = (box[0] + box[2]) / 2
-                center_y = (box[1] + box[3]) / 2
-                print(f"✅ 自动锁定目标 [{text_query}] 坐标: ({center_x:.1f}, {center_y:.1f})")
-                return np.array([[center_x, center_y]], dtype=np.float32)
+                box = np.array(boxes[0], dtype=np.float32) # [x1, y1, x2, y2]
+                print(f"✅ 自动锁定目标 [{text_query}] 区域: {box.tolist()}")
+                return None, box
         except Exception:
             pass
         
         print(f"⚠️ 未能识别到 [{text_query}]，降级使用画面中心点。")
-        return np.array([[image.size[0]/2, image.size[1]/2]], dtype=np.float32)
+        center_pt = np.array([[image.size[0]/2, image.size[1]/2]], dtype=np.float32)
+        return center_pt, None
 
-    def infer(self, video_path: str, click_points: Optional[List] = None, text_query: Optional[str] = None, **kwargs) -> PerceptionResult:
-        """支持手动点击点 或 文本自动识别。click_points 可为 list 或 np.ndarray，勿用 if not click_points 判断。"""
+    def infer(self, video_path: str, click_points: Optional[List] = None, text_query: Optional[str] = None, box_prompt: Optional[List] = None, **kwargs) -> PerceptionResult:
+        """支持手动点击点、外部 box_prompt 或 文本自动识别。click_points 可为 list 或 np.ndarray，勿用 if not click_points 判断。"""
         if self.model is None:
             raise RuntimeError("SAM2 未初始化")
 
         # 统一为可安全用 len() 判断的序列，避免 numpy 数组的 "truth value ambiguous"
         _no_points = click_points is None or (hasattr(click_points, "__len__") and len(click_points) == 0)
 
-        # --- 自动识别逻辑 ---
-        if _no_points and text_query:
+        # --- 外部 box_prompt 优先使用 ---
+        box_np = None
+        if box_prompt is not None:
+            box_np = np.array(box_prompt, dtype=np.float32)
+            _no_points = False  # 有 box 就不需要点提示
+
+        # --- 自动识别逻辑（仅在无 box_prompt 且无点提示时触发） ---
+        elif _no_points and text_query:
             cap = cv2.VideoCapture(video_path)
             ret, frame = cap.read()
             cap.release()
             if not ret or frame is None or frame.size == 0:
                 raise ValueError(f"无法读取视频首帧: {video_path}，请检查文件是否损坏或格式是否支持")
-            temp_frame_path = "output/temp/first_frame_detect.jpg"
-            os.makedirs("output/temp", exist_ok=True)
-            cv2.imwrite(temp_frame_path, frame)
-            click_points = self._auto_detect(temp_frame_path, text_query)
+            click_points, box_np = self._auto_detect(frame, text_query)
             _no_points = False
 
-        if click_points is None or (hasattr(click_points, "__len__") and len(click_points) == 0):
-            raise ValueError("必须提供 click_points 或 text_query 其中的一个。")
+        if (_no_points or click_points is None) and box_np is None:
+            raise ValueError("必须提供 click_points、box_prompt 或 text_query 其中的一个。")
 
         # --- SAM2 核心推理逻辑 ---
         state = self.model.init_state(video_path=video_path, offload_video_to_cpu=True)
 
-        points_np = np.array(click_points, dtype=np.float32)
-        if points_np.ndim == 1:
-            points_np = points_np.reshape(1, -1)
-        labels_np = np.ones(len(points_np), dtype=np.int32)
-
-        self.model.add_new_points(state, frame_idx=0, obj_id=1, points=points_np, labels=labels_np)
+        if box_np is not None:
+            # 如果有 box 提示，优先使用 box
+            self.model.add_new_points_or_box(state, frame_idx=0, obj_id=1, box=box_np)
+        else:
+            # 降级使用点提示
+            points_np = np.array(click_points, dtype=np.float32)
+            if points_np.ndim == 1:
+                points_np = points_np.reshape(1, -1)
+            labels_np = np.ones(len(points_np), dtype=np.int32)
+            self.model.add_new_points(state, frame_idx=0, obj_id=1, points=points_np, labels=labels_np)
         
         h_list, x_list, mask_list, truncated_list = [], [], [], []
         

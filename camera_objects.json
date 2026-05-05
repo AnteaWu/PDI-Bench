@@ -20,8 +20,7 @@
       "dolphin",
       "large octopus",
       "snake",
-      "peacock",
-      "school of fish"
+      "peacock"
     ],
     "orbital_rotation": [
       "silver compact SUV",
@@ -37,12 +36,5 @@
       "vintage car",
       "boat",
       "robot crate"
-    ],
-    "dolly_zoom": [
-      "lone tree",
-      "person",
-      "red mailbox",
-      "lighthouse",
-      "doorway"
     ]
   }

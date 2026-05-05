@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  tracking_nonhuman_bio/3
+Video:     /data/xueyanz/code/PDI-Bench/videos/cogvideoX/tracking_nonhuman_bio/3/large chrome sphere.mp4
+GPU:       4
+Prompt:    large chrome sphere
+--------------------------------------------------
+FINAL PDI SCORE: 0.1697
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0821
+ - Trajectory Component (H-X):     0.3513
+ - Rigidity Component (Stability): 0.1162
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.3959
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/cogvideox_eval/tracking_nonhuman_bio/3
+==================================================

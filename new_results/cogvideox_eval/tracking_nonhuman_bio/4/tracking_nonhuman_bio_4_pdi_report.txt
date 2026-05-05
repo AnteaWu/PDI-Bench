@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  tracking_nonhuman_bio/4
+Video:     /data/xueyanz/code/PDI-Bench/videos/cogvideoX/tracking_nonhuman_bio/4/large truck carrying a blue container.mp4
+GPU:       5
+Prompt:    large truck carrying a blue container
+--------------------------------------------------
+FINAL PDI SCORE: 0.1709
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.1523
+ - Trajectory Component (H-X):     0.2119
+ - Rigidity Component (Stability): 0.1572
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0211
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/cogvideox_eval/tracking_nonhuman_bio/4
+==================================================

@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  nonrigid_nonhuman_bio/2
+Video:     /data/xueyanz/code/PDI-Bench/videos/seedance/nonrigid_nonhuman_bio/2/dolphin.mp4
+GPU:       7
+Prompt:    dolphin
+--------------------------------------------------
+FINAL PDI SCORE: 0.3098
+OVERALL GRADE:   C (Obvious Distortion) - 明显透视幻觉/滑步
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.5899
+ - Trajectory Component (H-X):     0.1937
+ - Rigidity Component (Stability): 0.0000
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0319
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/seedance_eval/nonrigid_nonhuman_bio/2
+==================================================

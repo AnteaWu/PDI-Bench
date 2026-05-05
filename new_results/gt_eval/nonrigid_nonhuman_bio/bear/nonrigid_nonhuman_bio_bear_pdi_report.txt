@@ -1,0 +1,25 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  nonrigid_nonhuman_bio/bear
+Video:     /data/xueyanz/code/PDI-Bench/videos/GT/nonrigid_nonhuman_bio/bear.mp4
+GPU:       7
+--------------------------------------------------
+FINAL PDI SCORE: 0.1082
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0774
+ - Trajectory Component (H-X):     0.1645
+ - Rigidity Component (Stability): 0.0569
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.8782
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/gt_eval/nonrigid_nonhuman_bio/bear
+==================================================

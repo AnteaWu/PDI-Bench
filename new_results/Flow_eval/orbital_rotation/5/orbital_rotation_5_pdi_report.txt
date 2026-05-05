@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  orbital_rotation/5
+Video:     /data/xueyanz/code/PDI-Bench/videos/camera_video/Flow/orbital_rotation/5/Tractor_making_turn_in_field_f0f64ab5f6.mp4
+GPU:       5
+Prompt:    green tractor
+--------------------------------------------------
+FINAL PDI SCORE: 0.2070
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.1822
+ - Trajectory Component (H-X):     0.3134
+ - Rigidity Component (Stability): 0.1347
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.6208
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/Flow_eval/orbital_rotation/5
+==================================================

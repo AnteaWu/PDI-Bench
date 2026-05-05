@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  nonrigid_nonhuman_bio/1
+Video:     /data/xueyanz/code/PDI-Bench/videos/self-forcing/nonrigid_nonhuman_bio/1/large eagle.mp4
+GPU:       5
+Prompt:    large eagle
+--------------------------------------------------
+FINAL PDI SCORE: 0.2233
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.1628
+ - Trajectory Component (H-X):     0.2255
+ - Rigidity Component (Stability): 0.3398
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/self_forcing_eval/nonrigid_nonhuman_bio/1
+==================================================

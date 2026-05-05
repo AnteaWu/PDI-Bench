@@ -13,10 +13,10 @@ engine_3d: "mega_sam"
 # w_rigidity:     sigma(rigidity)    — 物体 3D 刚性是否稳定
 # w_vp:         epsilon_vp         — 前景与场景是否共用同一透视空间（视角耦合）
 weights:
-  w_scale: 0.3
-  w_trajectory: 0.2
+  w_scale: 0.4
+  w_trajectory: 0.4
   w_rigidity: 0.2
-  w_vp: 0.3
+  w_vp: 0.0
 
 # 推理设置
 device: "cuda"
@@ -28,11 +28,11 @@ save_cache: True
 # 对 mega_sam 输出的 .npz 进行地面平整度 / 尺度跳变 / 重投影残差三项数学检测，
 # 并可选地调用视觉大模型进行语义审计。
 reconstruction_audit:
-  enabled: true          # 是否启用 mega-sam 重建质量审计（默认关闭）
-  npz_path: null          # mega-sam 输出 .npz 的路径；为 null 时由 pipeline 自动推断
-  max_frames: 60          # 最多使用的帧数，超出则均匀降采样
+  enabled: true
+  npz_path: null
+  max_frames: 60
   mllm:
-    enabled: true        # 是否调用 MLLM 进行第二层语义审计（需配置 api_key）
+    enabled: false
     api_key: "10a00d5a-a37c-4a7e-8fb3-7d8e3a3e6d66"
     base_url: "https://ark.cn-beijing.volces.com/api/v3"
     model: "doubao-seed-2-0-pro-260215"

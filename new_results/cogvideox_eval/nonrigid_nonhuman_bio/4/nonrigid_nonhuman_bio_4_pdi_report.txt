@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  nonrigid_nonhuman_bio/4
+Video:     /data/xueyanz/code/PDI-Bench/videos/cogvideoX/nonrigid_nonhuman_bio/4/snake.mp4
+GPU:       5
+Prompt:    snake
+--------------------------------------------------
+FINAL PDI SCORE: 0.3820
+OVERALL GRADE:   C (Obvious Distortion) - 明显透视幻觉/滑步
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.5966
+ - Trajectory Component (H-X):     0.1891
+ - Rigidity Component (Stability): 0.2523
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.9710
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/cogvideox_eval/nonrigid_nonhuman_bio/4
+==================================================

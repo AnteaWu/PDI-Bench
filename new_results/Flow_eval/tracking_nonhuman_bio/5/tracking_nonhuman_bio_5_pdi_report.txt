@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  tracking_nonhuman_bio/5
+Video:     /data/xueyanz/code/PDI-Bench/videos/camera_video/Flow/tracking_nonhuman_bio/5/Logistics_crate_moving_on_conveyor_3b2464e55d.mp4
+GPU:       4
+Prompt:    metal logistics crate
+--------------------------------------------------
+FINAL PDI SCORE: 0.1281
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0256
+ - Trajectory Component (H-X):     0.1886
+ - Rigidity Component (Stability): 0.2229
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0059
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/Flow_eval/tracking_nonhuman_bio/5
+==================================================

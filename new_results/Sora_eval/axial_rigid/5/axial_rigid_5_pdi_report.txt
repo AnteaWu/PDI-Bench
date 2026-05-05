@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/5
+Video:     /data/xueyanz/code/PDI-Bench/videos/Sora/axial_rigid/5/20260302_2148_01kjrww1khfbrsqvf0d8613e9s.mp4
+GPU:       6
+Prompt:    heavy cargo truck
+--------------------------------------------------
+FINAL PDI SCORE: 0.1290
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0258
+ - Trajectory Component (H-X):     0.3650
+ - Rigidity Component (Stability): 0.0000
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/Sora_eval/axial_rigid/5
+==================================================

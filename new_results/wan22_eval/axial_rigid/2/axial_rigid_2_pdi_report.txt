@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/2
+Video:     /data/xueyanz/code/PDI-Bench/wan22/axial_rigid/2/2026-03-02-19-21-45_seed42_A_high-speed_train_moving_toward_the_viewer_on_a_straight_track,_low-angle_handheld_perspective,_rai.mp4
+GPU:       5
+Prompt:    high-speed train
+--------------------------------------------------
+FINAL PDI SCORE: 0.6535
+OVERALL GRADE:   F (Geometric Failure) - 物理逻辑彻底崩溃
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.5411
+ - Trajectory Component (H-X):     0.4857
+ - Rigidity Component (Stability): 1.0000
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/wan22_eval/axial_rigid/2
+==================================================

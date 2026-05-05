@@ -52,8 +52,9 @@ class TrackWrapper(BasePerceptor):
     ) -> PerceptionResult:
         """前景+背景一次性追踪。
 
-        背景点通过在 mask 外区域均匀采样获得，与前景点合并后送入同一次
-        Co-Tracker 推理，推理结束后再按 n_fg 拆分，避免重复加载模型。
+        前景点：SIFT -> Shi-Tomasi -> 均匀网格（三级 fallback）
+        背景点：Shi-Tomasi -> 均匀网格（两级 fallback）
+        合并后送入同一次 Co-Tracker 推理，推理结束后再按 n_fg 拆分。
         bg_tracks 存入 metadata['bg_tracks'] / metadata['bg_visibility']。
         """
         import cv2
@@ -88,11 +89,26 @@ class TrackWrapper(BasePerceptor):
         )
         small_mask = (small_mask > 0).astype(np.uint8)
 
-        # --- 2. 前景 queries（空间均匀网格采样）---
-        fg_queries_np = self._grid_sample_queries(small_mask, region=1, n=grid_size * grid_size)
+        # 第 0 帧灰度图，用于特征检测
+        first_frame_gray = cv2.cvtColor(frames[0], cv2.COLOR_RGB2GRAY)
 
-        # --- 3. 背景 queries ---
-        bg_queries_np = self._grid_sample_queries(small_mask, region=0, n=bg_grid_size * bg_grid_size)
+        # --- 2. 前景 queries：SIFT -> Shi-Tomasi -> 均匀网格 ---
+        n_fg = grid_size * grid_size
+        fg_queries_np = self._sift_sample_queries(first_frame_gray, small_mask, region=1, n=n_fg)
+        if len(fg_queries_np) < n_fg // 2:
+            pdi_logger.info(f"前景 SIFT 点不足({len(fg_queries_np)})，补充 Shi-Tomasi 角点")
+            extra = self._shi_tomasi_sample_queries(first_frame_gray, small_mask, region=1, n=n_fg - len(fg_queries_np))
+            fg_queries_np = np.vstack([fg_queries_np, extra]) if len(fg_queries_np) > 0 else extra
+        if len(fg_queries_np) < 2:
+            pdi_logger.warning("前景特征点极少，fallback 均匀网格")
+            fg_queries_np = self._grid_sample_queries(small_mask, region=1, n=n_fg)
+
+        # --- 3. 背景 queries：Shi-Tomasi -> 均匀网格 ---
+        n_bg = bg_grid_size * bg_grid_size
+        bg_queries_np = self._shi_tomasi_sample_queries(first_frame_gray, small_mask, region=0, n=n_bg)
+        if len(bg_queries_np) < 2:
+            pdi_logger.warning("背景角点极少，fallback 均匀网格")
+            bg_queries_np = self._grid_sample_queries(small_mask, region=0, n=n_bg)
 
         # --- 4. 合并 queries 送入推理 ---
         n_fg_pts = len(fg_queries_np)
@@ -163,6 +179,60 @@ class TrackWrapper(BasePerceptor):
                 "bg_visibility": bg_vis,
             },
         )
+
+    def _sift_sample_queries(
+        self,
+        gray: np.ndarray,
+        mask: np.ndarray,
+        region: int,
+        n: int,
+    ) -> np.ndarray:
+        """用 SIFT 在 mask 指定区域检测特征点（尺度/旋转不变）。
+
+        返回响应值最高的前 n 个点，格式 (M, 3) -> [frame=0, x, y]。
+        """
+        sift = cv2.SIFT_create(nfeatures=n * 4)
+        kps = sift.detect(gray, None)
+        if not kps:
+            return np.empty((0, 3), dtype=np.float32)
+
+        # 按响应值降序，只保留在目标区域内的点
+        kps = sorted(kps, key=lambda k: k.response, reverse=True)
+        h, w = mask.shape
+        pts = []
+        for kp in kps:
+            x, y = int(round(kp.pt[0])), int(round(kp.pt[1]))
+            if 0 <= y < h and 0 <= x < w and mask[y, x] == region:
+                pts.append([0.0, float(kp.pt[0]), float(kp.pt[1])])
+            if len(pts) >= n:
+                break
+
+        return np.array(pts, dtype=np.float32) if pts else np.empty((0, 3), dtype=np.float32)
+
+    def _shi_tomasi_sample_queries(
+        self,
+        gray: np.ndarray,
+        mask: np.ndarray,
+        region: int,
+        n: int,
+    ) -> np.ndarray:
+        """用 Shi-Tomasi 角点检测在 mask 指定区域采样。
+
+        返回 (M, 3) -> [frame=0, x, y]。
+        """
+        region_mask = (mask == region).astype(np.uint8) * 255
+        corners = cv2.goodFeaturesToTrack(
+            gray,
+            maxCorners=n,
+            qualityLevel=0.01,
+            minDistance=5,
+            mask=region_mask,
+        )
+        if corners is None:
+            return np.empty((0, 3), dtype=np.float32)
+
+        pts = [[0.0, float(c[0][0]), float(c[0][1])] for c in corners]
+        return np.array(pts, dtype=np.float32)
 
     def _grid_sample_queries(
         self,

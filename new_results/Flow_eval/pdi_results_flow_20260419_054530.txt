@@ -1,0 +1,52 @@
+==================================================================================================================================================
+  Flow Video Set - PDI Evaluation Summary
+  Generated: 2026-04-19 05:45:30
+==================================================================================================================================================
+  Category                  ID        PDI    Scale     Traj    Rigid       VP  Lv   Index Grade             ReconAudit    MLLM_OK
+--------------------------------------------------------------------------------------------------------------------------------------------------
+  axial_rigid               1      0.0658   0.0303   0.1490   0.0341   0.3792  A    Physical Realism        math:PASS     N/A    
+  axial_rigid               2      0.5373   0.8448   0.2022   0.4121   0.3413  C    Obvious Distortion      math:PASS     N/A    
+  axial_rigid               3      0.2876   0.4601   0.2502   0.0616   0.5267  B    Minor Jitter            math:FAIL     N/A    
+  axial_rigid               4      0.5298   0.7677   0.3048   0.3977   0.0000  C    Obvious Distortion      math:PASS     N/A    
+  axial_rigid               5      0.1961   0.3149   0.1744   0.0361   0.7458  B    Minor Jitter            math:FAIL     N/A    
+  axial_rigid               6      0.1862   0.1887   0.1885   0.1798   0.9550  B    Minor Jitter            math:PASS     N/A    
+    >> axial_rigid mean            0.3005   0.4344   0.2115   0.1869   0.4913         4/6 pass      
+  ------------------------------------------------------------------------------------------------------------------------------------------------
+  nonrigid_nonhuman_bio     1      0.1951   0.1691   0.1765   0.2543   0.9307  B    Minor Jitter            math:FAIL     N/A    
+  nonrigid_nonhuman_bio     2      4.0146   8.4960   0.2804   1.0000   0.5721  F    Geometric Failure       math:FAIL     N/A    
+  nonrigid_nonhuman_bio     3      0.5273   0.4267   0.2200   1.0000   0.0268  C    Obvious Distortion      math:FAIL     N/A    
+  nonrigid_nonhuman_bio     4      0.3492   0.0577   0.1532   1.0000   0.9972  C    Obvious Distortion      math:PASS     N/A    
+  nonrigid_nonhuman_bio     5      0.4854   0.7197   0.3041   0.3131   0.9844  C    Obvious Distortion      math:PASS     N/A    
+    >> nonrigid_nonhuman_bio mean  1.1143   1.9738   0.2268   0.7135   0.7022         2/5 pass      
+  ------------------------------------------------------------------------------------------------------------------------------------------------
+  orbital_rotation          1      0.2902   0.1661   0.3961   0.3713   0.9916  B    Minor Jitter            math:PASS     N/A    
+  orbital_rotation          2      0.4335   0.2384   0.1759   1.0000   0.0000  C    Obvious Distortion      math:PASS     N/A    
+  orbital_rotation          3      0.3825   0.7106   0.1902   0.0779   0.0526  C    Obvious Distortion      math:PASS     N/A    
+  orbital_rotation          4      1.8627   3.9449   0.2886   0.2955   0.9956  F    Geometric Failure       math:PASS     N/A    
+  orbital_rotation          5      0.2070   0.1822   0.3134   0.1347   0.6208  B    Minor Jitter            math:FAIL     N/A    
+    >> orbital_rotation mean       0.6352   1.0484   0.2728   0.3759   0.5321         4/5 pass      
+  ------------------------------------------------------------------------------------------------------------------------------------------------
+  partial_occlusion         1      0.2264   0.2345   0.2338   0.2062   0.0000  B    Minor Jitter            math:PASS     N/A    
+  partial_occlusion         2      0.2067   0.2541   0.3361   0.0000   0.2718  B    Minor Jitter            math:FAIL     N/A    
+  partial_occlusion         3      0.4670   0.2780   0.2327   1.0000   0.0054  C    Obvious Distortion      math:PASS     N/A    
+  partial_occlusion         4      0.1405   0.1790   0.2187   0.0006   0.9270  B    Minor Jitter            math:FAIL     N/A    
+  partial_occlusion         5      0.1282   0.1699   0.1676   0.0233   0.1505  B    Minor Jitter            math:FAIL     N/A    
+  partial_occlusion         6      0.2543   0.2467   0.3950   0.1203   0.8709  B    Minor Jitter            math:FAIL     N/A    
+    >> partial_occlusion mean      0.2372   0.2270   0.2640   0.2251   0.3709         2/6 pass      
+  ------------------------------------------------------------------------------------------------------------------------------------------------
+  tracking_nonhuman_bio     1      0.1505   0.0216   0.1539   0.3449   0.6993  B    Minor Jitter            math:FAIL     N/A    
+  tracking_nonhuman_bio     2      0.0774   0.0528   0.1806   0.0081   0.9362  A    Physical Realism        math:PASS     N/A    
+  tracking_nonhuman_bio     3      0.3820   0.7158   0.2558   0.0000   0.0198  C    Obvious Distortion      math:FAIL     N/A    
+  tracking_nonhuman_bio     4      0.0167   0.0120   0.0000   0.0412   0.3491  A    Physical Realism        math:FAIL     N/A    
+  tracking_nonhuman_bio     5      0.1281   0.0256   0.1886   0.2229   0.0059  B    Minor Jitter            math:PASS     N/A    
+  tracking_nonhuman_bio     6      0.5441   1.1120   0.2273   0.0003   0.8918  C    Obvious Distortion      math:FAIL     N/A    
+    >> tracking_nonhuman_bio mean  0.2165   0.3233   0.1677   0.1029   0.4837         2/5 pass      
+  ------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------
+  OVERALL MEAN                     0.4740   0.7507   0.2271   0.3049   0.5088
+  OVERALL STD                      0.7574   1.6588   0.0809   0.3487   0.3907
+  OVERALL MIN                      0.0167   0.0120   0.0000   0.0000   0.0000
+  OVERALL MAX                      4.0146   8.4960   0.3961   1.0000   0.9972
+==================================================================================================================================================
+
+  Total videos: 28  |  Succeeded: 28  |  Failed: 0

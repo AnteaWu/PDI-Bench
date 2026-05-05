@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  nonrigid_nonhuman_bio/1
+Video:     /data/xueyanz/code/PDI-Bench/videos/Sora/nonrigid_nonhuman_bio/1/20260303_0000_01kjs1s65cebtsk0a563qfv550.mp4
+GPU:       6
+Prompt:    large eagle
+--------------------------------------------------
+FINAL PDI SCORE: 0.1411
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0856
+ - Trajectory Component (H-X):     0.2464
+ - Rigidity Component (Stability): 0.0926
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0843
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/Sora_eval/nonrigid_nonhuman_bio/1
+==================================================

@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/1
+Video:     /data/xueyanz/code/PDI-Bench/videos/self-forcing/axial_rigid/1/red vintage car.mp4
+GPU:       3
+Prompt:    red vintage car
+--------------------------------------------------
+FINAL PDI SCORE: 0.1734
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.1316
+ - Trajectory Component (H-X):     0.2864
+ - Rigidity Component (Stability): 0.0312
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0265
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/self_forcing_eval/axial_rigid/1
+==================================================

@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/3
+Video:     /data/xueyanz/code/PDI-Bench/wan22/axial_rigid/3/2026-03-02-19-56-04_seed42_A_yellow_school_bus_driving_away_on_a_straight_tree-lined_suburban_street,_the_shot_tracking_from_a_.mp4
+GPU:       6
+Prompt:    yellow school bus
+--------------------------------------------------
+FINAL PDI SCORE: 0.4445
+OVERALL GRADE:   C (Obvious Distortion) - 明显透视幻觉/滑步
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.3137
+ - Trajectory Component (H-X):     0.1021
+ - Rigidity Component (Stability): 1.0000
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.6316
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/wan22_eval/axial_rigid/3
+==================================================

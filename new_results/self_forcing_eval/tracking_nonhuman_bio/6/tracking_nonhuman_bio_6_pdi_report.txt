@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  tracking_nonhuman_bio/6
+Video:     /data/xueyanz/code/PDI-Bench/videos/self-forcing/tracking_nonhuman_bio/6/large metal ball.mp4
+GPU:       5
+Prompt:    large metal ball
+--------------------------------------------------
+FINAL PDI SCORE: 0.1839
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0778
+ - Trajectory Component (H-X):     0.3602
+ - Rigidity Component (Stability): 0.0436
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.6334
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/self_forcing_eval/tracking_nonhuman_bio/6
+==================================================

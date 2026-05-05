@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  axial_rigid/6
+Video:     /data/xueyanz/code/PDI-Bench/wan22/axial_rigid/6/2026-03-02-21-38-28_seed42_A_large_shipping_container_being_pushed_away_on_a_straight_industrial_dock,_cranes_and_water_behind,.mp4
+GPU:       5
+Prompt:    large shipping container
+--------------------------------------------------
+FINAL PDI SCORE: 0.0504
+OVERALL GRADE:   A (Physical Realism) - 物理逻辑严丝合缝
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0124
+ - Trajectory Component (H-X):     0.1553
+ - Rigidity Component (Stability): 0.0000
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.0000
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    True
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: True
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/wan22_eval/axial_rigid/6
+==================================================

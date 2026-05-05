@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  tracking_nonhuman_bio/6
+Video:     /data/xueyanz/code/PDI-Bench/videos/camera_video/Flow/tracking_nonhuman_bio/6/Metal_ball_rolling_gallery_204d7744de.mp4
+GPU:       5
+Prompt:    large metal ball
+--------------------------------------------------
+FINAL PDI SCORE: 0.5441
+OVERALL GRADE:   C (Obvious Distortion) - 明显透视幻觉/滑步
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      1.1120
+ - Trajectory Component (H-X):     0.2273
+ - Rigidity Component (Stability): 0.0003
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.8918
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/Flow_eval/tracking_nonhuman_bio/6
+==================================================

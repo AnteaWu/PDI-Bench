@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  orbital_rotation/2
+Video:     /data/xueyanz/code/PDI-Bench/videos/self-forcing/orbital_rotation/2/sports car.mp4
+GPU:       5
+Prompt:    sports car
+--------------------------------------------------
+FINAL PDI SCORE: 0.1803
+OVERALL GRADE:   B (Minor Jitter) - 存在轻微几何抖动
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0711
+ - Trajectory Component (H-X):     0.3207
+ - Rigidity Component (Stability): 0.1181
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.9985
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/self_forcing_eval/orbital_rotation/2
+==================================================

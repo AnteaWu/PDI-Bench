@@ -1,0 +1,26 @@
+==================================================
+        PDI-Eval Final Audit Report
+==================================================
+Sequence:  partial_occlusion/4
+Video:     /data/xueyanz/code/PDI-Bench/videos/self-forcing/partial_occlusion/4/vintage car.mp4
+GPU:       3
+Prompt:    vintage car
+--------------------------------------------------
+FINAL PDI SCORE: 0.0983
+OVERALL GRADE:   A (Physical Realism) - 物理逻辑严丝合缝
+--------------------------------------------------
+INDICATOR BREAKDOWN:
+ - Scale Component (1/Z Law):      0.0210
+ - Trajectory Component (H-X):     0.2034
+ - Rigidity Component (Stability): 0.0428
+ - Rigidity Strategy:              策略 1 (3D 刚体比例协同法)
+ - VP Component (View Consistency):0.4050
+--------------------------------------------------
+RECONSTRUCTION AUDIT:
+ - RA Math Pass:    False
+ - RA MLLM Success: None
+ - RA MLLM Score:   None
+ - RA Overall Pass: False
+--------------------------------------------------
+Results saved to: /data/xueyanz/code/PDI-Bench/new_results/self_forcing_eval/partial_occlusion/4
+==================================================
