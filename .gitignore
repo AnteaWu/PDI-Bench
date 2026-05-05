@@ -55,6 +55,5 @@ data/1s.mp4
 !/camera_prompts.json
 
 /humanstudy/
-/__pycache__/
 /videos/
 /new_results/
