@@ -1,0 +1,15 @@
+version: norm_v1_gt_anchor
+alpha: 1.000000
+metrics:
+  scale:
+    median: 0.063900
+    mad: 0.033200
+    scale: 0.049222
+  traj:
+    median: 0.164500
+    mad: 0.032000
+    scale: 0.047443
+  rigid:
+    median: 0.086100
+    mad: 0.066200
+    scale: 0.098148

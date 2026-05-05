@@ -1,0 +1,40 @@
+{
+    "axial_rigid": [
+      "red vintage car",
+      "high-speed train",
+      "yellow school bus",
+      "silver metallic sphere",
+      "heavy cargo truck",
+      "large shipping container"
+    ],
+    "tracking_nonhuman_bio": [
+      "red sports car",
+      "autonomous suitcase",
+      "large chrome sphere",
+      "large truck carrying a blue container",
+      "metal logistics crate",
+      "large metal ball"
+    ],
+    "nonrigid_nonhuman_bio": [
+      "large eagle",
+      "dolphin",
+      "large octopus",
+      "snake",
+      "peacock"
+    ],
+    "orbital_rotation": [
+      "silver compact SUV",
+      "sports car",
+      "city bus",
+      "small delivery robot",
+      "green tractor"
+    ],
+    "partial_occlusion": [
+      "car",
+      "train",
+      "bus",
+      "vintage car",
+      "boat",
+      "robot crate"
+    ]
+  }

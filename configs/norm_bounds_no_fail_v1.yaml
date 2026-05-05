@@ -1,0 +1,15 @@
+version: norm_v1
+alpha: 1.000000
+metrics:
+  scale:
+    median: 0.150500
+    mad: 0.116400
+    scale: 0.172575
+  traj:
+    median: 0.188300
+    mad: 0.039300
+    scale: 0.058266
+  rigid:
+    median: 0.152300
+    mad: 0.135600
+    scale: 0.201041
