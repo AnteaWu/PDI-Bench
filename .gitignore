@@ -17,6 +17,7 @@ visualization/
 *.png
 *.npz
 *.npy
+!figures/**
 *.csv
 videos/
 test_lietorch.py
