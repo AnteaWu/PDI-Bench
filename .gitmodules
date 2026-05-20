@@ -1,0 +1,4 @@
+[submodule "third_party/mega_sam"]
+	path = third_party/mega_sam
+	url = https://github.com/mega-sam/mega-sam.git
+	ignore = dirty
