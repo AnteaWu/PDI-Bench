@@ -1,12 +1,12 @@
-# --- PDI-Eval 最终忽略规则 ---
+# --- PDI-Eval ignore rules ---
 
-# 1. 模型权重
+# 1. Model weights
 checkpoints/
 *.pth
 *.pt
 
 data/
-# 2. 数据与结果
+# 2. Data and results
 output/
 debug_results/
 new_results/
@@ -35,8 +35,8 @@ plot_pdi.py
 1.py
 analyze_model_evaluation.py
 app.py
-
-# 3. 系统与环境
+show/
+# 3. System and environment
 __pycache__/
 .vscode/
 .cursor/
@@ -46,14 +46,52 @@ env/data/1s.mp4
 data/1s.mp4
 
 
-# 4. 忽略根目录下的所有文件（保留子文件夹）
-/*
-!/*/
+# 4. Explicit root-file ignore (keep a small whitelist)
+# keep
 !/.gitignore
 !/README.md
 !/camera_objects.json
 !/camera_prompts.json
 
-/humanstudy/
-/videos/
-/new_results/
+# ignore other root files
+/1.py
+/analyze_model_evaluation.py
+/app.py
+/camera.md
+/car_strip4.png
+/check_sam2_npz.py
+/cotracker_check.py
+/cotracker_viz.mp4
+/debug_sam2.py
+/.gitmodules
+/how to start.md
+/improve_list.md
+/improvement_done.md
+/model_eval_analysis_20260420_045447.csv
+/model_eval_analysis_20260420_045447.md
+/my_eval_report_no_fail.csv
+/my_eval_report_no_fail.md
+/my_eval_report_with_fail_mean_gt_anchor.csv
+/my_eval_report_with_fail_mean_gt_anchor.md
+/my_final_report.csv
+/my_final_report.md
+/paper.tex
+/pdi_recalculate.py
+/plot_pdi.py
+/prompt.md
+/prompts.txt
+/README111.md
+/reconstruction_audit.py
+/render_pointcloud_views.py
+/requirements.txt
+/run_cotracker_object_only.py
+/sam2_check.py
+/sam2_preview.mp4
+/Self Forcing.pdf
+/test_lietorch.py
+/test.py
+/video_grid.jpg
+/video_grid.py
+/viz_cotracker.py
+/evaluation/evaluation.py
+/evaluation/evaluation_1.py
