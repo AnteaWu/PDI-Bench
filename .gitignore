@@ -6,6 +6,7 @@ checkpoints/
 *.pt
 
 data/
+!src/pdi_eval/data/
 # 2. Data and results
 output/
 debug_results/
