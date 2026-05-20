@@ -1,38 +1,38 @@
-# 模型路径
+# Model paths
 sam_ckpt: "checkpoints/sam2/sam2_hiera_large.pt"
 sam_cfg: "checkpoints/sam2/sam2_hiera_l.yaml"
 tracker_ckpt: "checkpoints/tracker/scaled_offline.pth"
-# Mega-SAM 内部权重已硬编码在 third_party/mega_sam/ 内部
-# 不需要在此处指定 mega_sam_ckpt，Wrapper 会自动寻找 internal paths
+# Mega-SAM internal weights are hard-coded inside third_party/mega_sam/
+# No need to specify mega_sam_ckpt here; the Wrapper resolves internal paths automatically
 
 engine_3d: "mega_sam"
 
-# PDI v2.0 评估权重
-# w_scale:      epsilon_scale      — 缩放节奏是否符合 h·Z 守恒
-# w_trajectory: epsilon_trajectory — 运动路径是否收敛到正确消失点
-# w_rigidity:     sigma(rigidity)    — 物体 3D 刚性是否稳定
-# w_vp:         epsilon_vp         — 前景与场景是否共用同一透视空间（视角耦合）
+# PDI v2.0 evaluation weights
+# w_scale:      epsilon_scale      — whether scale change follows h·Z conservation
+# w_trajectory: epsilon_trajectory — whether motion path converges to the correct vanishing point
+# w_rigidity:   epsilon_rigidity   — whether the object's 3D rigidity is stable
+# w_vp:         epsilon_vp         — whether foreground and scene share the same perspective space (view coupling)
 weights:
   w_scale: 0.4
   w_trajectory: 0.4
   w_rigidity: 0.2
   w_vp: 0.0
 
-# 推理设置
+# Inference settings
 device: "cuda"
-sampling_rate: 1 # 每隔几帧处理一次 (1代表逐帧)
+sampling_rate: 1 # process every N frames (1 = every frame)
 save_cache: True
 
-# MegaSAM 重建质量审计（双层：数学 + MLLM）
-# 设置 enabled: true 后，pipeline 会在每次评估结束时
-# 对 mega_sam 输出的 .npz 进行地面平整度 / 尺度跳变 / 重投影残差三项数学检测，
-# 并可选地调用视觉大模型进行语义审计。
+# MegaSAM reconstruction quality audit (two-layer: math + MLLM)
+# When enabled: true, the pipeline runs three math checks on the mega_sam .npz output
+# after each evaluation: ground flatness, scale-jump detection, and reprojection residual.
+# Optionally calls a vision-language model for semantic audit.
 reconstruction_audit:
   enabled: true
   npz_path: null
   max_frames: 60
   mllm:
     enabled: false
-    api_key: "10a00d5a-a37c-4a7e-8fb3-7d8e3a3e6d66"
+    api_key: "" # your api key
     base_url: "https://ark.cn-beijing.volces.com/api/v3"
     model: "doubao-seed-2-0-pro-260215"

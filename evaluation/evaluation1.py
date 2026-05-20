@@ -193,7 +193,7 @@ def _run_sequence(args):
             fh.write("INDICATOR BREAKDOWN:\n")
             fh.write(f" - Scale Component (1/Z Law):      {bd.get('scale_component',    0):.4f}\n")
             fh.write(f" - Trajectory Component (H-X):     {bd.get('traj_component',     0):.4f}\n")
-            fh.write(f" - Rigidity Component (Stability): {bd.get('rigidity_component', 0):.4f}\n")
+            fh.write(f" - Epsilon Rigidity: {bd.get('epsilon_rigidity', 0):.4f}\n")
             fh.write(f" - VP Component (View Consistency):{bd.get('vp_component',       0):.4f}\n")
             fh.write("-" * 50 + "\n")
             fh.write(f"Results saved to: {seq_out}\n")
@@ -204,7 +204,7 @@ def _run_sequence(args):
             "grade":              report.get("grade", "N/A"),
             "scale_component":    float(bd.get("scale_component",    0.0)),
             "traj_component":     float(bd.get("traj_component",     0.0)),
-            "rigidity_component": float(bd.get("rigidity_component", 0.0)),
+            "epsilon_rigidity": float(bd.get("epsilon_rigidity", 0.0)),
             "vp_component":       float(bd.get("vp_component",       0.0)),
         }
         return seq_name, result, None
@@ -259,7 +259,7 @@ def _load_cached_result(report_path: Path, seq_name: str):
             "grade":              _extract_grade(),
             "scale_component":    _extract("Scale Component"),
             "traj_component":     _extract("Trajectory Component"),
-            "rigidity_component": _extract("Rigidity Component"),
+            "epsilon_rigidity": _extract("Epsilon Rigidity"),
             "vp_component":       _extract("VP Component"),
         }
     except Exception:
@@ -274,7 +274,7 @@ def _parse_grade(grade_str: str):
     """
     Split grade string into letter and index description.
 
-    Example input:  "A (Physical Realism) - 物理逻辑严丝合缝"
+    Example input:  "A (Physical Realism) - physically consistent"
     Returns:        ("A", "Physical Realism")
     """
     letter = grade_str[0] if grade_str else "?"
@@ -324,7 +324,7 @@ def _write_table(rows: list, output_path: str) -> str:
             pdi = result["pdi_score"]
             sc  = result["scale_component"]
             tr  = result["traj_component"]
-            ri  = result["rigidity_component"]
+            ri  = result["epsilon_rigidity"]
             vp  = result["vp_component"]
             lv, idx_desc = _parse_grade(result["grade"])
             lines.append(

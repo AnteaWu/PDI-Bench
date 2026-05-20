@@ -82,8 +82,8 @@ def _run_sequence(args):
         config["cache_dir"] = str(_Path(config_path).parent.parent / "output" / "cache" / "hunyuan")
 
         pipeline = PDIEvaluationPipeline(config=config)
-        # text_query 来自 camera_objects.json，触发 Florence-2 → box → SAM2 box 提示
-        # 无对应条目时退化为画面中心点提示
+        # text_query from camera_objects.json; triggers Florence-2 -> box -> SAM2 box prompt
+        # Falls back to image center prompt when there is no matching entry
         if text_query:
             report = pipeline.run(video_path=video_path, text_query=text_query, render_output_dir=str(seq_out))
         else:
@@ -147,7 +147,7 @@ def _run_sequence(args):
             fh.write("INDICATOR BREAKDOWN:\n")
             fh.write(f" - Scale Component (1/Z Law):      {bd.get('scale_component',    0):.4f}\n")
             fh.write(f" - Trajectory Component (H-X):     {bd.get('traj_component',     0):.4f}\n")
-            fh.write(f" - Rigidity Component (Stability): {bd.get('rigidity_component', 0):.4f}\n")
+            fh.write(f" - Epsilon Rigidity: {bd.get('epsilon_rigidity', 0):.4f}\n")
             fh.write(f" - Rigidity Strategy:              {bd.get('rigidity_strategy', 'N/A')}\n")
             fh.write(f" - VP Component (View Consistency):{bd.get('vp_component',       0):.4f}\n")
             fh.write("-" * 50 + "\n")
@@ -167,7 +167,7 @@ def _run_sequence(args):
             "grade":              report.get("grade", "N/A"),
             "scale_component":    float(bd.get("scale_component",    0.0)),
             "traj_component":     float(bd.get("traj_component",     0.0)),
-            "rigidity_component": float(bd.get("rigidity_component", 0.0)),
+            "epsilon_rigidity": float(bd.get("epsilon_rigidity", 0.0)),
             "vp_component":       float(bd.get("vp_component",       0.0)),
             "ra_math_pass":       ra_math_pass,
             "ra_mllm_success":    ra_mllm_success,
@@ -231,7 +231,7 @@ def _load_cached_result(report_path: Path):
             "grade":              _extract_grade(),
             "scale_component":    _extract("Scale Component"),
             "traj_component":     _extract("Trajectory Component"),
-            "rigidity_component": _extract("Rigidity Component"),
+            "epsilon_rigidity": _extract("Epsilon Rigidity"),
             "vp_component":       _extract("VP Component"),
             "ra_math_pass":       _extract_bool("RA Math Pass"),
             "ra_mllm_success":    _extract_bool("RA MLLM Success"),
@@ -256,15 +256,15 @@ def _parse_grade(grade_str: str):
 
 
 def _fmt_recon(result: dict) -> str:
-    """将 reconstruction audit 字段格式化为紧凑字符串，宽度约 12 字符。
+    """Format reconstruction audit fields as a compact string (~12 chars).
 
-    显示规则：
-      N/A        — 未启用审计
-      math:PASS  — 仅数学层通过
-      math:FAIL  — 仅数学层未通过
-      MLLM:P(8)  — MLLM 通过，得分 8
-      MLLM:F(3)  — MLLM 不通过，得分 3
-      MLLM:?(-)  — MLLM 调用失败（无结果）
+    Display rules:
+      N/A        — audit disabled
+      math:PASS  — math layer passed only
+      math:FAIL  — math layer failed
+      MLLM:P(8)  — MLLM passed, score 8
+      MLLM:F(3)  — MLLM failed, score 3
+      MLLM:?(-)  — MLLM call failed (no result)
     """
     if result.get("ra_overall_pass") is None:
         return "N/A"
@@ -328,7 +328,7 @@ def _write_table(rows: list, output_path: str) -> str:
                 pdi = result["pdi_score"]
                 sc  = result["scale_component"]
                 tr  = result["traj_component"]
-                ri  = result["rigidity_component"]
+                ri  = result["epsilon_rigidity"]
                 vp  = result["vp_component"]
                 lv, idx_desc = _parse_grade(result["grade"])
                 ra_str  = _fmt_recon(result)

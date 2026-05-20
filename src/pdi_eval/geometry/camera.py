@@ -2,24 +2,24 @@ import numpy as np
 from typing import Optional, Tuple, List
 
 class CameraModel:
-    """相机几何模型 (Intrinsic & Extrinsic Manager)
-    
-    核心功能：
-    1. 3D 到 2D 投影 (World-to-Pixel)
-    2. 多帧 3D 点云在世界坐标系下的尺度对齐
-    3. 管理主点 (Principal Point) 与焦距 (Focal Length)
+    """Camera geometry (intrinsic & extrinsic helper).
+
+    Features:
+    1. Project 3D to 2D (world to pixel)
+    2. Scale-align multi-frame 3D in world coordinates
+    3. Track principal point and focal length
     """
     def __init__(self, focal_length: float, image_size: Tuple[int, int]):
         """
         Args:
-            focal_length: 隐含焦距 (像素单位)
-            image_size: (H, W) 视频分辨率
+            focal_length: focal length in pixels
+            image_size: (H, W) video resolution
         """
         self.H, self.W = image_size
         self.f = focal_length
         self.cx, self.cy = self.W / 2.0, self.H / 2.0
         
-        # 构造内参矩阵 K
+        # Intrinsic matrix K
         self.K = np.array([
             [self.f, 0.0,    self.cx],
             [0.0,    self.f, self.cy],
@@ -27,25 +27,25 @@ class CameraModel:
         ], dtype=np.float32)
 
     def project_3d_to_2d(self, pts_3d: np.ndarray, extrinsic_matrix: np.ndarray) -> np.ndarray:
-        """实现投影公式: p = K * [R|t] * P
+        """Project: p = K * [R|t] * P
         
         Args:
-            pts_3d: (N, 3) 空间坐标
-            extrinsic_matrix: (4, 4) 相机外参矩阵 [R|t]
+            pts_3d: (N, 3) world coordinates
+            extrinsic_matrix: (4, 4) [R|t]
             
         Returns:
-            (N, 2) 像素坐标 (u, v)
+            (N, 2) pixel (u, v)
         """
-        # 1. 变换到相机坐标系: P_cam = R * P_world + t
+        # 1. Camera frame: P_cam = R * P_world + t
         R = extrinsic_matrix[:3, :3]
         t = extrinsic_matrix[:3, 3:4]
         pts_cam = (R @ pts_3d.T + t).T  # (N, 3)
         
-        # 2. 深度归一化 (防止除零)
+        # 2. Depth normalize (avoid div by zero)
         z = pts_cam[:, 2:3]
         z[np.abs(z) < 1e-6] = 1e-6
         
-        # 3. 映射到像素平面
+        # 3. Map to pixel plane
         pts_norm = pts_cam[:, :2] / z
         u = self.f * pts_norm[:, 0] + self.cx
         v = self.f * pts_norm[:, 1] + self.cy
@@ -53,10 +53,7 @@ class CameraModel:
         return np.stack([u, v], axis=1)
 
     def align_to_unit_scale(self, z_seq: np.ndarray) -> np.ndarray:
-        """尺度归一化 (Scale Normalization)
-        
-        由于单目 3D 具有尺度不确定性，将首帧深度/位移设为 1.0 (Unit Scale)
-        """
+        """Normalize scale: monocular depth is ambiguous; set first-frame scale to 1."""
         if len(z_seq) == 0:
             return z_seq
         z0 = z_seq[0]
@@ -65,11 +62,11 @@ class CameraModel:
         return z_seq / z0
 
     def get_world_pcd(self, pcd_cam: np.ndarray, pose: np.ndarray) -> np.ndarray:
-        """将相机坐标系下的点云转回世界坐标系
+        """Map camera-frame point cloud to world frame.
         
-        pose: 相机位姿 [R|t]
+        pose: camera pose [R|t]
         """
-        # P_world = R.inv * (P_cam - t)
+        # P_world = R^-1 * (P_cam - t)
         R = pose[:3, :3]
         t = pose[:3, 3:4]
         pts_world = (np.linalg.inv(R) @ (pcd_cam.T - t)).T

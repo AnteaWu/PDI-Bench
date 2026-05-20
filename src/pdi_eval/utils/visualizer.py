@@ -1,92 +1,84 @@
 import os
 import cv2
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as mp
 import numpy as np
 from typing import List, Dict, Any, Tuple
 
 class EvidenceVisualizer:
-    """证据生成器 (Evidence Generator)
+    """Generate PDI audit plots and overlay videos.
     
-    核心功能：
-    1. 时域残差图：绘制 ε_scale 和 ε_trajectory 波动。
-    2. 透视线叠加：在原视频上叠加运动消失点和收敛线。
-    3. 侧视对比：原视频与深度图的 side-by-side 生成。
+    Features:
+    1. Time-series residual plots for scale and trajectory terms.
+    2. Perspective overlay: vanishing point and convergence lines on video.
+    3. Side-by-side raw vs pseudo-colored depth.
     """
     def __init__(self, output_dir: str = "output/"):
         self.output_dir = output_dir
 
     def draw_error_curves(self, scale_errors: np.ndarray, traj_errors: np.ndarray, video_id: str):
-        """绘制几何残差随时间波动的曲线图"""
-        plt.figure(figsize=(10, 4), dpi=100)
+        """Plot geometric residuals over time."""
+        mp.figure(figsize=(10, 4), dpi=100)
         
-        # 绘制残差曲线
-        plt.plot(scale_errors, label='Scale Residue (Volume Breathing)', color='blue', alpha=0.8)
-        plt.plot(traj_errors, label='Trajectory Residue (Skating)', color='red', alpha=0.8)
+        mp.plot(scale_errors, label='Scale Residue (Volume Breathing)', color='blue', alpha=0.8)
+        mp.plot(traj_errors, label='Trajectory Residue (Skating)', color='red', alpha=0.8)
         
-        plt.title(f"PDI Geometric Residue Analysis: {video_id}")
-        plt.xlabel("Frame Index")
-        plt.ylabel("Error Magnitude")
-        plt.grid(True, linestyle='--', alpha=0.6)
-        plt.legend()
+        mp.title(f"PDI Geometric Residue Analysis: {video_id}")
+        mp.xlabel("Frame Index")
+        mp.ylabel("Error Magnitude")
+        mp.grid(True, linestyle='--', alpha=0.6)
+        mp.legend()
         
-        # 保存图表
         save_path = f"{self.output_dir}/{video_id}_error_plot.png"
-        plt.tight_layout()
-        plt.savefig(save_path)
-        plt.close()
+        mp.tight_layout()
+        mp.savefig(save_path)
+        mp.close()
         return save_path
 
     def draw_volume_stability(self, volume_history: np.ndarray, video_id: str):
-        """绘制 3D 高度随时间波动的曲线图"""
-        plt.figure(figsize=(10, 4), dpi=100)
+        """Plot normalized 3D extent over time."""
+        mp.figure(figsize=(10, 4), dpi=100)
         
-        # 归一化高度以方便观察波动
         if len(volume_history) > 0 and np.mean(volume_history) > 1e-6:
             norm_vol = volume_history / np.mean(volume_history)
         else:
             norm_vol = volume_history
             
-        plt.plot(norm_vol, label='Normalized 3D Height', color='green', alpha=0.8)
-        plt.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5)
+        mp.plot(norm_vol, label='Normalized 3D Height', color='green', alpha=0.8)
+        mp.axhline(y=1.0, color='gray', linestyle='--', alpha=0.5)
         
-        plt.title(f"3D Volume Stability Analysis: {video_id}")
-        plt.xlabel("Frame Index")
-        plt.ylabel("Relative Height (y/mean_y)")
-        plt.grid(True, linestyle='--', alpha=0.6)
-        plt.legend()
+        mp.title(f"3D Volume Stability Analysis: {video_id}")
+        mp.xlabel("Frame Index")
+        mp.ylabel("Relative Height (y/mean_y)")
+        mp.grid(True, linestyle='--', alpha=0.6)
+        mp.legend()
         
         save_path = f"{self.output_dir}/{video_id}_volume_plot.png"
-        plt.tight_layout()
-        plt.savefig(save_path)
-        plt.close()
+        mp.tight_layout()
+        mp.savefig(save_path)
+        mp.close()
         return save_path
 
     def overlay_perspective_evidence(self, video_frames: np.ndarray, vanishing_point: Tuple[float, float], 
                                      tracks: np.ndarray, pdi_summary: Dict[str, Any]):
-        """在视频帧上叠加消失点 (VP) 和理论收敛线"""
+        """Draw VP and theoretical convergence lines on frames."""
         output_frames = []
         vp_x, vp_y = int(vanishing_point[0]), int(vanishing_point[1])
         
         for i, frame in enumerate(video_frames):
-            # 深拷贝一帧用于绘图
             canvas = frame.copy()
             
-            # 1. 绘制当前的消失点 (VP)
-            cv2.circle(canvas, (vp_x, vp_y), 10, (0, 0, 255), -1) # 红色实心圆标记消失点
+            cv2.circle(canvas, (vp_x, vp_y), 10, (0, 0, 255), -1)
             cv2.putText(canvas, "Vanishing Point", (vp_x + 15, vp_y), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
             
-            # 2. 绘制从物体各个追踪点指向消失点的“理论收敛线”
             if i < tracks.shape[1]:
                 for p_idx in range(tracks.shape[0]):
                     start_pt = (int(tracks[p_idx, i, 0]), int(tracks[p_idx, i, 1]))
-                    # 绿色虚线表示理论一致性路径
                     cv2.line(canvas, start_pt, (vp_x, vp_y), (0, 255, 0), 1, cv2.LINE_AA)
             
-            # 3. 在左上角标记 PDI 等级和总分
             score = pdi_summary['pdi_score']
             grade = pdi_summary['grade']
-            cv2.rectangle(canvas, (10, 10), (450, 80), (0, 0, 0), -1) # 黑色底框
+            cv2.rectangle(canvas, (10, 10), (450, 80), (0, 0, 0), -1)
             cv2.putText(canvas, f"PDI Score: {score}", (20, 40), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
             cv2.putText(canvas, f"PDI Grade: {grade}", (20, 70), 
@@ -97,11 +89,8 @@ class EvidenceVisualizer:
         return np.stack(output_frames)
 
     def generate_side_by_side(self, raw_video: np.ndarray, depth_map_video: np.ndarray) -> np.ndarray:
-        """生成原视频与深度图的对比视频（Side-by-Side）"""
-        # 1. 确保尺寸对齐
+        """Concatenate raw RGB and depth (Jet) side by side."""
         T, H, W, C = raw_video.shape
-        # 2. 对深度图进行伪彩色映射 (Jet)
-        # 3. 将原图和深度图横向拼接
         sbs_frames = []
         for i in range(T):
             frame_sbs = np.concatenate([raw_video[i], depth_map_video[i]], axis=1)
@@ -109,10 +98,10 @@ class EvidenceVisualizer:
         return np.stack(sbs_frames)
 
     def save_mask_sample(self, masks: np.ndarray, video_frames: np.ndarray, video_id: str) -> str:
-        """随机抽一帧，将 SAM2 mask 叠加到原始帧上保存为单张 PNG。
+        """Random frame: overlay SAM2 mask and save PNG.
 
         Returns:
-            保存文件路径
+            output path
         """
         T = masks.shape[0]
         i = int(np.random.randint(0, T))
@@ -135,8 +124,8 @@ class EvidenceVisualizer:
 
     def save_video(self, frames: np.ndarray, filename: str, fps: float = 25.0) -> str:
         """
-        将标注帧序列写入 MP4。处理编码器不可用、目录缺失、帧数不一致等问题。
-        frames: (T, H, W, C) RGB，与 overlay_perspective_evidence 输出一致。
+        Write RGB frame sequence to MP4; tries several fourcc backends.
+        frames: (T, H, W, C) RGB, same as overlay_perspective_evidence output.
         """
         if frames is None or len(frames) == 0:
             return ""

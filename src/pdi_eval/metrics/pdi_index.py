@@ -2,18 +2,18 @@ import numpy as np
 from typing import Dict, List, Any, Union
 
 class PDIIndexCalculator:
-    """PDI 总分合成模块 (The Judge)
-    
-    核心功能：
-    1. 指标聚合：接收尺度、轨迹、3D 稳定性和 VP 耦合残差。
-    2. 鲁棒性处理：兼容输入为序列(Array)或预计算好的 RMSE(Scalar)。
-    3. 等级判定：提供直观的物理真实度等级。
+    """PDI aggregate score module (The Judge).
 
-    PDI v2.0 四项指标：
-        epsilon_scale      : 缩放节奏对不对？
-        epsilon_trajectory : 奔向消失点的路径对不对？
-        sigma(rigidity)    : 物体自身稳不稳（刚性）？
-        epsilon_vp         : 物体与场景是否在同一透视空间（视角耦合）？
+    Responsibilities:
+    1. Aggregate metrics: scale, trajectory, 3D stability, and VP-coupling residuals.
+    2. Robust inputs: accepts either error sequences (arrays) or precomputed RMSE (scalar).
+    3. Grade assignment: maps score to an interpretable physical-realism grade.
+
+    PDI v2.0 components:
+        epsilon_scale      : Is scale change rhythm consistent with perspective?
+        epsilon_trajectory : Does motion converge toward the correct vanishing point?
+        epsilon_rigidity   : Is the object rigid / stable in 3D?
+        epsilon_vp         : Do object and scene share the same perspective space (view coupling)?
     """
     def __init__(
         self,
@@ -30,10 +30,10 @@ class PDIIndexCalculator:
         }
 
     def _ensure_scalar(self, val: Union[float, np.ndarray]) -> float:
-        """辅助函数：确保输入被转化为标量误差值"""
+        """Coerce input to a scalar error value."""
         if isinstance(val, (np.ndarray, list)):
             if len(val) == 0: return 0.0
-            # 如果传入的是序列，则计算其 RMSE；如果已经是单个值的数组，则取该值
+            # Sequences -> RMSE; single-element arrays -> that value
             if len(val) > 1:
                 return float(np.sqrt(np.mean(np.square(val))))
             return float(np.array(val).flatten()[0])
@@ -46,14 +46,14 @@ class PDIIndexCalculator:
         rigidity_cv: float,
         eps_vp: float = 0.0,
     ) -> Dict[str, Any]:
-        """合成最终 PDI v2.0 分数与明细
+        """Compute final PDI v2.0 score and breakdown.
 
         Args:
-            scale_errors:       尺度残差序列或其 RMSE 值
-            trajectory_errors:  轨迹残差序列或其 RMSE 值
-            rigidity_cv:        刚性变异系数（点对距离比值的 std/mean）
-            eps_vp:             VP 偏移归一化残差（视角耦合一致性），范围 [0, 1]
-                                若背景线不足（LSD < 5 条）则外部传入 0.0 以降低权重影响。
+            scale_errors:       Scale residual sequence or its RMSE.
+            trajectory_errors:  Trajectory residual sequence or its RMSE.
+            rigidity_cv:        Rigidity residual (epsilon_rigidity): coefficient of variation of pairwise distance ratios.
+            eps_vp:             Normalized VP offset residual (view coupling), in [0, 1].
+                                If background lines are insufficient (LSD < 5), callers may pass 0.0 to reduce weight impact.
         """
         rmse_scale = self._ensure_scalar(scale_errors)
         rmse_traj  = self._ensure_scalar(trajectory_errors)
@@ -73,14 +73,14 @@ class PDIIndexCalculator:
             "breakdown": {
                 "scale_component":    round(rmse_scale,  4),
                 "traj_component":     round(rmse_traj,   4),
-                "rigidity_component": round(rigidity_cv, 4),
+                "epsilon_rigidity": round(rigidity_cv, 4),
                 "vp_component":       round(eps_vp,      4),
             },
         }
 
     def assign_grade(self, score: float) -> str:
-        """物理真实度等级判定标准"""
-        if score < 0.1: return "A (Physical Realism) - 物理逻辑严丝合缝"
-        if score < 0.3: return "B (Minor Jitter) - 存在轻微几何抖动"
-        if score < 0.6: return "C (Obvious Distortion) - 明显透视幻觉/滑步"
-        return "F (Geometric Failure) - 物理逻辑彻底崩溃"
+        """Map score to physical-realism grade."""
+        if score < 0.1: return "A (Physical Realism) - physically consistent and tight"
+        if score < 0.3: return "B (Minor Jitter) - slight geometric jitter"
+        if score < 0.6: return "C (Obvious Distortion) - obvious perspective illusion or foot sliding"
+        return "F (Geometric Failure) - geometric coherence breaks down"

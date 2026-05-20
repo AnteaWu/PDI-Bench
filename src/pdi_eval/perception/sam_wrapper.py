@@ -8,7 +8,7 @@ from typing import List, Tuple, Optional, Any
 from PIL import Image
 from ..utils.logger import pdi_logger
 
-# 尝试引入 SAM2 官方库
+# Optional official SAM2
 try:
     from sam2.build_sam import build_sam2_video_predictor
 except ImportError:
@@ -20,15 +20,14 @@ class Sam2Wrapper(BasePerceptor):
         self.checkpoint = os.path.abspath(checkpoint)
         self.config = config
         
-        # --- [新增] Florence-2 自动检测引擎初始化 ---
+        # Florence-2 auto-detector (lazy init)
         self.processor = None
         self.detector = None
         
-        # SAM2 初始化逻辑 (保持你原有的 Hydra 修复逻辑)
         self._init_sam2()
 
     def _init_sam2(self):
-        """保持原有的 SAM2 加载逻辑"""
+        """Load SAM2 (Hydra config dir workaround)."""
         from pathlib import Path
         config_path = Path(self.config).resolve()
         config_dir = str(config_path.parent)
@@ -43,36 +42,28 @@ class Sam2Wrapper(BasePerceptor):
                 self.model = build_sam2_video_predictor(config_name, self.checkpoint)
     
     def _init_detector(self):
-            """延迟加载检测器，并使用完整的 Mock 绕过 flash_attn 检查"""
+            """Lazy-load Florence-2; mock flash_attn if missing."""
             if self.detector is None:
                 import sys
                 from types import ModuleType
                 from importlib.machinery import ModuleSpec
 
-                # --- 完善后的黑科技：提供完整的模块规范 ---
                 if "flash_attn" not in sys.modules:
-                    pdi_logger.info("检测到环境缺少 flash_attn，正在注入 Mock 模块以绕过硬编码检查...")
+                    pdi_logger.info("flash_attn missing; injecting mock module for import checks...")
                     
-                    # 1. 创建主模块
                     mock_flash_attn = ModuleType("flash_attn")
-                    # 2. 【关键修复】补齐 __spec__，否则 find_spec 会报错
                     mock_flash_attn.__spec__ = ModuleSpec("flash_attn", None)
-                    # 3. 模拟一些模型可能检查的版本号
                     mock_flash_attn.__version__ = "2.5.8"
                     
-                    # 注入到系统路径
                     sys.modules["flash_attn"] = mock_flash_attn
                     
-                    # 4. 针对 Florence-2 可能进一步调用的子路径进行二级 Mock
-                    # 某些版本的模型会尝试 from flash_attn.flash_attn_interface import ...
                     interface_name = "flash_attn.flash_attn_interface"
                     mock_interface = ModuleType(interface_name)
                     mock_interface.__spec__ = ModuleSpec(interface_name, None)
                     sys.modules[interface_name] = mock_interface
-                # --- 结束 ---
 
                 from transformers import AutoProcessor, AutoModelForCausalLM
-                pdi_logger.info("正在加载 Florence-2 自动化检测引擎...")
+                pdi_logger.info("Loading Florence-2 detector...")
                 model_id = 'microsoft/Florence-2-base'
                 
                 self.processor = AutoProcessor.from_pretrained(
@@ -80,7 +71,6 @@ class Sam2Wrapper(BasePerceptor):
                     trust_remote_code=True
                 )
                 
-                # 必须指定 attn_implementation="sdpa"，否则它即便通过了 import 也会在运行时找算子
                 self.detector = AutoModelForCausalLM.from_pretrained(
                     model_id, 
                     trust_remote_code=True,
@@ -89,11 +79,10 @@ class Sam2Wrapper(BasePerceptor):
                 ).to(self.device).eval()
 
     def _auto_detect(self, frame_bgr: np.ndarray, text_query: str) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
-        """使用 Florence-2 自动获取物体中心点或 Bounding Box，直接接受 BGR numpy 帧，无需写临时文件"""
+        """Florence-2 caption-to-box; accepts BGR frame in memory."""
         self._init_detector()
         image = Image.fromarray(cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB))
         
-        # 构造检测指令：在图中寻找特定的物体
         prompt = f"<CAPTION_TO_PHRASE_GROUNDING>{text_query}"
         inputs = self.processor(text=prompt, images=image, return_tensors="pt").to(self.device)
         inputs = {k: v.to(self.detector.dtype) if torch.is_floating_point(v) else v for k, v in inputs.items()}
@@ -110,55 +99,48 @@ class Sam2Wrapper(BasePerceptor):
         results = self.processor.batch_decode(generated_ids, skip_special_tokens=False)[0]
         parsed_answer = self.processor.post_process_generation(results, task="<CAPTION_TO_PHRASE_GROUNDING>", image_size=image.size)
         
-        # 提取第一个匹配到的 Bounding Box
         try:
             boxes = parsed_answer["<CAPTION_TO_PHRASE_GROUNDING>"]["bboxes"]
             if len(boxes) > 0:
-                box = np.array(boxes[0], dtype=np.float32) # [x1, y1, x2, y2]
-                print(f"✅ 自动锁定目标 [{text_query}] 区域: {box.tolist()}")
+                box = np.array(boxes[0], dtype=np.float32)
+                pdi_logger.info(f"Auto-selected target [{text_query}] box: {box.tolist()}")
                 return None, box
         except Exception:
             pass
         
-        print(f"⚠️ 未能识别到 [{text_query}]，降级使用画面中心点。")
+        pdi_logger.warning(f"No detection for [{text_query}]; falling back to image center.")
         center_pt = np.array([[image.size[0]/2, image.size[1]/2]], dtype=np.float32)
         return center_pt, None
 
     def infer(self, video_path: str, click_points: Optional[List] = None, text_query: Optional[str] = None, box_prompt: Optional[List] = None, **kwargs) -> PerceptionResult:
-        """支持手动点击点、外部 box_prompt 或 文本自动识别。click_points 可为 list 或 np.ndarray，勿用 if not click_points 判断。"""
+        """Manual points, external box_prompt, or text-driven Florence-2. For click_points use len(), not truthiness."""
         if self.model is None:
-            raise RuntimeError("SAM2 未初始化")
+            raise RuntimeError("SAM2 not initialized")
 
-        # 统一为可安全用 len() 判断的序列，避免 numpy 数组的 "truth value ambiguous"
         _no_points = click_points is None or (hasattr(click_points, "__len__") and len(click_points) == 0)
 
-        # --- 外部 box_prompt 优先使用 ---
         box_np = None
         if box_prompt is not None:
             box_np = np.array(box_prompt, dtype=np.float32)
-            _no_points = False  # 有 box 就不需要点提示
+            _no_points = False
 
-        # --- 自动识别逻辑（仅在无 box_prompt 且无点提示时触发） ---
         elif _no_points and text_query:
             cap = cv2.VideoCapture(video_path)
             ret, frame = cap.read()
             cap.release()
             if not ret or frame is None or frame.size == 0:
-                raise ValueError(f"无法读取视频首帧: {video_path}，请检查文件是否损坏或格式是否支持")
+                raise ValueError(f"Cannot read first frame: {video_path}; check file path or codec")
             click_points, box_np = self._auto_detect(frame, text_query)
             _no_points = False
 
         if (_no_points or click_points is None) and box_np is None:
-            raise ValueError("必须提供 click_points、box_prompt 或 text_query 其中的一个。")
+            raise ValueError("Provide one of: click_points, box_prompt, or text_query.")
 
-        # --- SAM2 核心推理逻辑 ---
         state = self.model.init_state(video_path=video_path, offload_video_to_cpu=True)
 
         if box_np is not None:
-            # 如果有 box 提示，优先使用 box
             self.model.add_new_points_or_box(state, frame_idx=0, obj_id=1, box=box_np)
         else:
-            # 降级使用点提示
             points_np = np.array(click_points, dtype=np.float32)
             if points_np.ndim == 1:
                 points_np = points_np.reshape(1, -1)
@@ -186,7 +168,6 @@ class Sam2Wrapper(BasePerceptor):
             truncated_list.append(is_edge)
             
         self.model.reset_state(state)
-        # 释放检测器显存
         if self.detector:
             del self.detector, self.processor
             self.detector, self.processor = None, None

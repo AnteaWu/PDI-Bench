@@ -1,13 +1,13 @@
-"""重建质量双层审计模块
+"""Two-layer reconstruction quality audit.
 
-第一层（数学）：低成本、极速、高严谨性
-  - 地面平整度 RANSAC
-  - 尺度跳变检测（Z 二阶导）
-  - 重投影残差检查
+Layer 1 (math): low cost, fast, strict checks
+  - Ground flatness via RANSAC / plane fit
+  - Scale jump (second derivative of Z)
+  - Reprojection residual
 
-第二层（MLLM 语义）：Open3D 多视角渲染 + 视觉大模型 API 裁判
-  - 自动渲染中间帧 / 末尾帧 / 全局稀疏三张图并拼接
-  - 调用 OpenAI 兼容接口（豆包 / GPT-4o 等），结构化 JSON 返回
+Layer 2 (MLLM semantics): Open3D multi-view render + vision-language API
+  - Renders mid / end / global sparse panels and stitches them
+  - OpenAI-compatible API (e.g. Doubao, GPT-4o), structured JSON response
 """
 
 import base64
@@ -25,11 +25,11 @@ from ..utils.logger import pdi_logger
 
 
 # ------------------------------------------------------------------ #
-#  第一层：数学自检                                                   #
+#  Layer 1: math self-check                                              #
 # ------------------------------------------------------------------ #
 
 def _fit_plane_svd(pts: np.ndarray) -> float:
-    """SVD 平面拟合，适用于任意旋转坐标系，比最小二乘更鲁棒。"""
+    """SVD plane fit; works in any rotated frame; more robust than ordinary least squares."""
     if len(pts) < 3:
         return 0.0
     centroid = np.mean(pts, axis=0)
@@ -46,7 +46,7 @@ def audit_ground_flatness(
     bottom_ratio: float = 0.3,
     rmse_threshold: float = 0.08,
 ) -> Tuple[float, bool]:
-    """地面平整度审计：采样前中后三段，SVD 拟合平面，检测勺子状扭曲。"""
+    """Ground flatness: sample early/mid/late segments, SVD plane fit, detect spoon-shaped warping."""
     T, H, W, _ = pointmaps.shape
     all_pts = []
     sample_t = [0, T // 2, T - 1]
@@ -74,7 +74,7 @@ def audit_ground_flatness(
 
     rmse = _fit_plane_svd(pts_all)
     passed = rmse < rmse_threshold
-    pdi_logger.info(f"地面平整度 SVD RMSE={rmse:.4f} ({'pass' if passed else 'FAIL'})")
+    pdi_logger.info(f"Ground flatness SVD RMSE={rmse:.4f} ({'pass' if passed else 'FAIL'})")
     return rmse, passed
 
 
@@ -83,7 +83,7 @@ def audit_scale_jump(
     masks: np.ndarray,
     jump_threshold: float = 0.5,
 ) -> Tuple[float, bool]:
-    """尺度跳变检测：计算前景区域中值深度的二阶差分，检测瞬时偏移。"""
+    """Scale jump: second difference of foreground median depth; detects sudden shifts."""
     T = depth_z.shape[0]
     if T < 3:
         return 0.0, True
@@ -103,7 +103,7 @@ def audit_scale_jump(
     d2 = np.abs(np.diff(z_norm, n=2))
     max_jump = float(d2.max()) if len(d2) > 0 else 0.0
     passed = max_jump < jump_threshold
-    pdi_logger.info(f"尺度跳变检测 max_d2Z={max_jump:.4f} ({'pass' if passed else 'FAIL'})")
+    pdi_logger.info(f"Scale jump max_d2Z={max_jump:.4f} ({'pass' if passed else 'FAIL'})")
     return max_jump, passed
 
 
@@ -111,12 +111,12 @@ def audit_reprojection_residual(
     residuals: Optional[np.ndarray],
     threshold: float = 2.0,
 ) -> Tuple[float, bool]:
-    """重投影残差检查：读取 MegaSAM 输出的残差序列均值。"""
+    """Reprojection residual: mean of MegaSAM residual sequence."""
     if residuals is None or len(residuals) == 0:
         return 0.0, True
     mean_res = float(np.mean(residuals))
     passed = mean_res < threshold
-    pdi_logger.info(f"重投影残差均值={mean_res:.4f}px ({'pass' if passed else 'FAIL'})")
+    pdi_logger.info(f"Mean reprojection residual={mean_res:.4f}px ({'pass' if passed else 'FAIL'})")
     return mean_res, passed
 
 
@@ -126,7 +126,7 @@ def audit_reconstruction_math(
     masks: np.ndarray,
     residuals: Optional[np.ndarray] = None,
 ) -> Dict[str, Any]:
-    """第一层数学审计，汇总三项指标。"""
+    """Layer-1 math audit: combine the three checks."""
     result: Dict[str, Any] = {}
 
     if pointmaps is not None and pointmaps.ndim == 4:
@@ -149,7 +149,7 @@ def audit_reconstruction_math(
 
 
 # ------------------------------------------------------------------ #
-#  第二层：Open3D 渲染 + MLLM 语义审计                               #
+#  Layer 2: Open3D render + MLLM semantic audit                         #
 # ------------------------------------------------------------------ #
 
 _MLLM_PROMPT = (
@@ -181,7 +181,7 @@ def _build_colored_pointcloud(
     max_pts: int = 100000,
     sample_frames: int = 30,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """聚合全量点云坐标与颜色（Global Map）。均匀采样 sample_frames 帧叠加。"""
+    """Fuse colored point cloud (global map) by evenly sampling sample_frames frames."""
     T, H, W, _ = pointmaps.shape
     frame_indices = np.linspace(0, T - 1, min(T, sample_frames), dtype=int).tolist()
     pts_list, rgb_list = [], []
@@ -222,24 +222,24 @@ def _render_views_matplotlib(
     all_rgb: np.ndarray,
     img_size: int = 512,
 ) -> Optional[np.ndarray]:
-    """matplotlib 三视角散点图渲染，headless 可靠，作为 open3d 失败时的兜底。"""
+    """Matplotlib three-view scatter; reliable headless fallback when Open3D fails."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     px_plot, py_plot, pz_plot = all_pts[:, 0], all_pts[:, 2], -all_pts[:, 1]
 
-    # 每个轴独立缩放，避免大 Z 范围把 X/Y 压成一根针
+    # Per-axis scaling so a huge Z range does not squash X/Y into a needle
     cx, cy, cz = px_plot.mean(), py_plot.mean(), pz_plot.mean()
     hx = px_plot.ptp() / 2 + 1e-6
     hy = py_plot.ptp() / 2 + 1e-6
     hz = pz_plot.ptp() / 2 + 1e-6
 
-    # 点大小随点数自适应：点越多，单点越小，保证整体密度感适中
+    # Point size scales with count: more points -> smaller dots for balanced density
     n_pts = len(all_pts)
     pt_size = max(2.0, min(12.0, 800000.0 / max(n_pts, 1)))
 
-    # 渲染分辨率提升到 2x 再下采样，抗锯齿更好
+    # Render at 2x then downsample for better anti-aliasing
     render_dpi = 150
     px = img_size / render_dpi
     view_params = [(90, -90, "Top"), (0, 0, "Side"), (30, 45, "45deg")]
@@ -270,19 +270,19 @@ def _render_views_open3d(
     frames: Optional[List[np.ndarray]] = None,
     img_size: int = 512,
 ) -> Optional[np.ndarray]:
-    """生成白底三视角点云拼图（img_size*3 × img_size），发给 MLLM 审计。
+    """White-background three-panel point cloud (img_size*3 x img_size) for MLLM.
 
-    LEFT  (view1): 中间单帧正面 45°，主体特写
-    MIDDLE(view2): 中间段 5 帧侧视，判断厚度/深度
-    RIGHT (view3): 全局稀疏俯视，判断地面平整度与轨迹
+    LEFT  (view1): single-frame 45 deg frontal, subject close-up
+    MIDDLE(view2): 5-frame side stack for thickness / depth
+    RIGHT (view3): sparse global top-down for ground flatness and trajectory
     """
     import sys
     T, H, W, _ = pointmaps.shape
 
-    # 前置检查：pointmaps 全零说明是 fallback，无法渲染
+    # Preflight: all-zero pointmaps means fallback; cannot render
     sample_idx = np.linspace(0, T - 1, min(T, 5), dtype=int)
     if not any(np.any(pointmaps[t] != 0) for t in sample_idx):
-        pdi_logger.warning("pointmaps 全为零（mega_sam fallback），跳过 MLLM 渲染")
+        pdi_logger.warning("pointmaps all zero (mega_sam fallback); skip MLLM render")
         return None
 
     n_frames_avail = len(frames) if frames else 0
@@ -299,7 +299,7 @@ def _render_views_open3d(
                 fr = frames[t]
                 fh, fw = fr.shape[:2]
                 if (fh, fw) != (H, W):
-                    # 高分辨率帧：按坐标映射直接从原始像素取色，避免 resize 把饱和色平均掉
+                    # High-res frame: map coords to source pixels for color to avoid resize washing out saturated colors
                     ys, xs = np.where(valid)
                     ys_orig = np.clip((ys * fh / H).astype(int), 0, fh - 1)
                     xs_orig = np.clip((xs * fw / W).astype(int), 0, fw - 1)
@@ -308,8 +308,8 @@ def _render_views_open3d(
                 else:
                     rgb = cv2.cvtColor(fr, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
                     c = rgb[valid]
-                # sRGB → linear：Open3D OffscreenRenderer 在线性空间渲染，
-                # 不做转换会把 sRGB 当 linear 显示，导致颜色偏白
+                # sRGB -> linear: OffscreenRenderer expects linear radiance;
+                # feeding sRGB as linear makes colors look washed out
                 c = np.clip(c ** 2.2, 0.0, 1.0).astype(np.float32)
             else:
                 z = p[:, 2]
@@ -340,10 +340,10 @@ def _render_views_open3d(
     pts_global, col_global = _build_pts(global_idx, sparse_ratio=0.05)
 
     if pts_single is None and pts_global is None:
-        pdi_logger.warning("所有帧均无有效点，无法渲染")
+        pdi_logger.warning("No valid points in any frame; cannot render")
         return None
 
-    # 三视角配置（MegaSAM 坐标: X=右, Y=下, Z=前）
+    # Three views (MegaSAM coords: X=right, Y=down, Z=forward)
     view_specs = [
         dict(pts=pts_single, col=col_single, front=[0,   -0.2, -1  ], up=[0, -1,  0], zoom=0.5),
         dict(pts=pts_window, col=col_window, front=[1,   -0.2, -0.3], up=[0, -1,  0], zoom=0.5),
@@ -355,7 +355,7 @@ def _render_views_open3d(
         is_win = sys.platform == "win32"
         rendered = []
 
-        # 单例 OffscreenRenderer，复用 EGL context，避免多次初始化 segfault
+        # Single OffscreenRenderer; reuse EGL context to avoid repeated init segfault
         renderer = None if is_win else o3d.visualization.rendering.OffscreenRenderer(img_size, img_size)
         mat = None
         if renderer is not None:
@@ -403,22 +403,22 @@ def _render_views_open3d(
                 vis.destroy_window()
                 rendered.append((img * 255).astype(np.uint8))
 
-        pdi_logger.info("open3d 白底三视角渲染成功")
+        pdi_logger.info("Open3D white-background three-view render succeeded")
         return np.concatenate(rendered, axis=1)
 
     except Exception as e:
-        pdi_logger.warning(f"open3d 渲染失败，降级到 matplotlib: {e}")
+        pdi_logger.warning(f"Open3D render failed; falling back to matplotlib: {e}")
 
     fb_pts, fb_rgb = _build_colored_pointcloud(pointmaps, masks, frames)
     return _render_views_matplotlib(fb_pts, fb_rgb, img_size)
 
 
 def _encode_image_b64(img: np.ndarray) -> str:
-    """将 RGB ndarray 编码为 base64 JPEG 字符串。"""
+    """Encode RGB ndarray as base64 JPEG string."""
     bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     ok, buf = cv2.imencode(".jpg", bgr, [cv2.IMWRITE_JPEG_QUALITY, 85])
     if not ok:
-        raise RuntimeError("图像编码失败")
+        raise RuntimeError("Image encoding failed")
     return base64.b64encode(buf.tobytes()).decode("utf-8")
 
 
@@ -431,7 +431,7 @@ def audit_reconstruction_mllm(
     save_render_path: Optional[str] = None,
     frames: Optional[List[np.ndarray]] = None,
 ) -> Dict[str, Any]:
-    """第二层 MLLM 语义审计。"""
+    """Layer-2 MLLM semantic audit."""
     result: Dict[str, Any] = {
         "render_success": False,
         "reconstruction_success": None,
@@ -442,25 +442,25 @@ def audit_reconstruction_mllm(
 
     composite = _render_views_open3d(pointmaps, masks, frames)
     if composite is None:
-        pdi_logger.warning("MLLM 审计跳过：渲染失败")
+        pdi_logger.warning("MLLM audit skipped: render failed")
         return result
     result["render_success"] = True
 
     if save_render_path:
         bgr = cv2.cvtColor(composite, cv2.COLOR_RGB2BGR)
         cv2.imwrite(save_render_path, bgr)
-        pdi_logger.info(f"渲染图已保存: {save_render_path}")
+        pdi_logger.info(f"Render image saved: {save_render_path}")
 
     try:
         from openai import OpenAI
     except ImportError:
-        pdi_logger.warning("openai 包未安装，跳过 MLLM API 调用")
+        pdi_logger.warning("openai package not installed; skip MLLM API call")
         return result
 
     b64 = _encode_image_b64(composite)
     client = OpenAI(api_key=api_key, base_url=base_url)
 
-    pdi_logger.info(f"正在调用 MLLM 语义审计 ({model})...")
+    pdi_logger.info(f"Calling MLLM semantic audit ({model})...")
     try:
         response = client.chat.completions.create(
             model=model,
@@ -482,19 +482,19 @@ def audit_reconstruction_mllm(
         result["reason"] = str(parsed.get("reason", ""))
         result["score"]  = int(parsed.get("score", 5))
         pdi_logger.info(
-            f"MLLM 裁判: success={result['reconstruction_success']} "
+            f"MLLM verdict: success={result['reconstruction_success']} "
             f"score={result['score']} reason={result['reason']}"
         )
     except json.JSONDecodeError:
-        pdi_logger.warning(f"MLLM 返回非 JSON 格式: {raw[:100]}")
+        pdi_logger.warning(f"MLLM returned non-JSON: {raw[:100]}")
     except Exception as e:
-        pdi_logger.warning(f"MLLM API 调用失败: {e}")
+        pdi_logger.warning(f"MLLM API call failed: {e}")
 
     return result
 
 
 # ------------------------------------------------------------------ #
-#  统一入口                                                           #
+#  Unified entry                                                         #
 # ------------------------------------------------------------------ #
 
 def audit_reconstruction(
@@ -506,17 +506,17 @@ def audit_reconstruction(
     save_render_path: Optional[str] = None,
     frames: Optional[List[np.ndarray]] = None,
 ) -> Dict[str, Any]:
-    """双层重建质量审计统一入口。
+    """Unified entry for two-layer reconstruction audit.
 
     Args:
-        pointmaps:        (T, H, W, 3) MegaSAM 点云序列，可为 None
-        depth_z:          (T, H, W) 深度图序列
-        masks:            (T, H, W) 前景 mask
-        residuals:        (T,) MegaSAM 重投影残差，可为 None
-        mllm_config:      dict，包含 api_key / base_url / model 等字段；
-                          为 None 则跳过第二层
-        save_render_path: 调试用，将渲染图保存到该路径
-        frames:           BGR 视频帧列表，用于点云着色（可选）
+        pointmaps:        (T, H, W, 3) MegaSAM point map sequence, or None
+        depth_z:          (T, H, W) depth maps
+        masks:            (T, H, W) foreground masks
+        residuals:        (T,) MegaSAM reprojection residuals, or None
+        mllm_config:      dict with api_key / base_url / model / ...
+                          If None, skip layer 2
+        save_render_path: debug: save composite render here
+        frames:           optional BGR frames for point coloring
 
     Returns:
         {
@@ -540,7 +540,7 @@ def audit_reconstruction(
                 frames=frames,
             )
         else:
-            pdi_logger.info("数学层审计未通过，跳过 MLLM 调用以节省费用")
+            pdi_logger.info("Math layer failed; skip MLLM call to save cost")
 
     mllm_pass = (
         mllm_result is None
@@ -556,14 +556,14 @@ def audit_reconstruction(
 
 
 # ------------------------------------------------------------------ #
-#  从 .npz + 视频加载数据                                             #
+#  Load data from .npz (+ optional video)                                #
 # ------------------------------------------------------------------ #
 
 def _load_video_frames_ffmpeg(
     video_path: str,
     max_frames: int = 60,
 ) -> List[np.ndarray]:
-    """用 ffmpeg pipe 读取视频帧（BGR），绕过 OpenCV/GStreamer 编解码限制。"""
+    """Read video frames (BGR) via ffmpeg pipe; avoids some OpenCV/GStreamer decode limits."""
     import subprocess as _sp
     video_path = str(Path(video_path).resolve())
     probe = _sp.run(
@@ -573,7 +573,7 @@ def _load_video_frames_ffmpeg(
         capture_output=True, text=True,
     )
     if probe.returncode != 0 or not probe.stdout.strip():
-        pdi_logger.warning(f"ffprobe 无法读取视频: {video_path}")
+        pdi_logger.warning(f"ffprobe could not read video: {video_path}")
         return []
     parts = probe.stdout.strip().split(",")
     w, h = int(parts[0]), int(parts[1])
@@ -604,15 +604,15 @@ def load_from_npz(
     video_path: Optional[str] = None,
     max_frames: int = 60,
 ) -> Dict[str, Any]:
-    """从 MegaSAM .npz 文件（及可选视频）加载审计所需数据。
+    """Load audit inputs from a MegaSAM .npz (and optional video).
 
     Args:
-        npz_path:   MegaSAM 输出的 .npz 路径，应包含 pointmaps / camera_poses
-        video_path: 对应原始视频路径，用于提取 RGB 帧着色（可选）
-        max_frames: 最多使用的帧数，超出则均匀降采样
+        npz_path:   path to MegaSAM .npz; should contain pointmaps / camera_poses
+        video_path: optional source video for RGB frames used for coloring
+        max_frames: max frames to use; uniformly subsample if exceeded
 
     Returns:
-        dict 包含: pointmaps, depth_z, masks, residuals, frames(BGR)
+        dict with pointmaps, depth_z, masks, residuals, frames (BGR)
     """
     data = np.load(npz_path, allow_pickle=True)
     pdi_logger.info(f"npz keys: {list(data.keys())}")
@@ -626,12 +626,12 @@ def load_from_npz(
     if "depth_z" in data:
         depth_z = np.asarray(data["depth_z"])
         if depth_z.ndim < 3 and pointmaps is not None:
-            pdi_logger.info("depth_z 为 1-D，改用 pointmaps[:,:,:,2] 作为深度图")
+            pdi_logger.info("depth_z is 1-D; using pointmaps[:,:,:,2] as depth maps")
             depth_z = pointmaps[:, :, :, 2]
     elif pointmaps is not None:
         depth_z = pointmaps[:, :, :, 2]
     else:
-        raise ValueError("npz 中既无 depth_z 也无 pointmaps，无法运行审计")
+        raise ValueError("npz has neither depth_z nor pointmaps; cannot run audit")
 
     # masks
     if "masks" in data:
@@ -641,7 +641,7 @@ def load_from_npz(
     else:
         T, H, W = depth_z.shape[:3]
         masks = np.zeros((T, H, W), dtype=np.uint8)
-        pdi_logger.warning("npz 中无 masks 字段，使用全零占位（无前景区域）")
+        pdi_logger.warning("npz has no masks field; using zeros (no foreground)")
 
     # residuals
     residuals = None
@@ -650,7 +650,7 @@ def load_from_npz(
             residuals = np.asarray(data[k])
             break
 
-    # 降采样
+    # Temporal subsample
     T = depth_z.shape[0]
     if T > max_frames:
         idx = np.linspace(0, T - 1, max_frames, dtype=int)
@@ -661,11 +661,11 @@ def load_from_npz(
         if residuals is not None:
             residuals = residuals[idx]
 
-    # 视频 RGB 帧
+    # Video BGR frames
     frames: List[np.ndarray] = []
     if video_path and Path(video_path).exists():
         frames = _load_video_frames_ffmpeg(video_path, max_frames=max_frames)
-        pdi_logger.info(f"从视频读取 {len(frames)} 帧")
+        pdi_logger.info(f"Read {len(frames)} frames from video")
 
     return dict(
         pointmaps=pointmaps,
@@ -677,7 +677,7 @@ def load_from_npz(
 
 
 # ------------------------------------------------------------------ #
-#  白色背景三视角独立渲染（可视化工具）                               #
+#  White-background three views (visualization helper)                   #
 # ------------------------------------------------------------------ #
 
 def render_three_views_white_bg(
@@ -690,10 +690,10 @@ def render_three_views_white_bg(
     point_size: float = 6.0,
     sample_frames: int = 20,
 ) -> List[str]:
-    """渲染白色背景的三视角静态图，保存到 output_dir。
+    """Render white-background three views; save under output_dir.
 
     Returns:
-        已保存的图片路径列表 [view1.png, view2.png, view3.png]
+        list of saved paths [view1.png, view2.png, view3.png]
     """
     all_pts, all_col = _build_colored_pointcloud(
         pointmaps, masks, frames,
@@ -701,13 +701,13 @@ def render_three_views_white_bg(
         sample_frames=sample_frames,
     )
     if len(all_pts) == 0:
-        pdi_logger.warning("render_three_views_white_bg: 无有效点，跳过渲染")
+        pdi_logger.warning("render_three_views_white_bg: no valid points; skip render")
         return []
 
     try:
         import open3d as o3d
     except ImportError:
-        pdi_logger.warning("open3d 未安装，无法渲染白底三视角")
+        pdi_logger.warning("open3d not installed; cannot render white-background views")
         return []
 
     pcd = o3d.geometry.PointCloud()
@@ -735,6 +735,6 @@ def render_three_views_white_bg(
         out_path = str(Path(output_dir) / f"{spec['name']}.png")
         cv2.imwrite(out_path, cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
         saved.append(out_path)
-        pdi_logger.info(f"白底视角已保存: {out_path}")
+        pdi_logger.info(f"White-background view saved: {out_path}")
 
     return saved

@@ -1,13 +1,19 @@
 {
-  "axial_rigid": [
-    "A handheld following shot of a red vintage car driving away on a straight desert highway, harsh noon light and heat haze on the horizon, subtle shake and lateral drift.",
-    "A high-speed train moving toward the viewer on a straight track, low-angle handheld perspective, rails and gravel receding toward a clear vanishing point.",
-    "A yellow school bus driving away on a straight tree-lined suburban street, the shot tracking from a low position behind, morning light and clean asphalt.",
-    "A silver metallic sphere rolling away on a long reflective marble floor in a bright gallery, the shot following closely with slight sway.",
-    "A heavy cargo truck moving away on a straight bridge at night, tail lights glowing, subtle frame shake, city lights in the distance.",
-    "A large shipping container being pushed away on a straight industrial dock, cranes and water behind, moving viewpoint, overcast industrial light."
+  "Biological_Motion": [
+    "A smooth following shot of a large eagle flying at high speed parallel to a cliff, rock face and sea below, clear sky.",
+    "A following shot from a moving boat of a dolphin swimming and leaping in the waves alongside, spray and sunlight.",
+    "A handheld shot of a large octopus swimming away in a complex coral reef, tentacles waving, colorful fish and coral, blue water and light shafts.",
+    "A backward-moving shot following a snake slithering through dense colorful flowers on the ground, petals and stems, soft daylight.",
+    "A moving shot following a peacock walking and shaking its tail feathers in a palace garden, fountains and trimmed hedges, ornate tiles."
   ],
-  "tracking_nonhuman_bio": [
+  "Curved_Motion": [
+    "A handheld tracking perspective follows a silver compact SUV navigating a sharp hairpin turn on a winding mountain road. The view orbits slightly to capture the vehicle transitioning from a front-view to a side-view against the pine forest background.",
+    "A low-angle shot follows a sports car drifting through a 90-degree corner on a professional race track. The car rotates intensely while the moving shot emphasizes the shifting vanishing lines of the curb and tire marks.",
+    "A cinematic tracking shot follows a city bus driving through a large, ornate stone roundabout. The view maintains a side perspective, showing the bus constantly changing its orientation relative to the central fountain and surrounding city traffic.",
+    "A ground-level perspective tracking a small delivery robot as it makes a sharp turn at a sidewalk corner. The shot stays close, highlighting the rotation of the robot's boxy frame against the detailed brickwork.",
+    "A handheld shot follows a green tractor making a wide turn at the edge of a plowed field. The view moves with the vehicle, capturing the shifting angles of the heavy wheels and mechanical parts against the vast landscape."
+  ],
+  "Dynamic_Tracking": [
     "A handheld following shot of a red sports car driving on a straight multi-lane highway, city skyline and roadside trees in the background receding rapidly with parallax.",
     "A smooth following shot of an autonomous suitcase moving through a vast airport terminal, repeated columns and floor patterns rushing past in frame.",
     "A close handheld shot following a large chrome sphere rolling along a straight, reflective museum corridor, exhibits and windows flowing past.",
@@ -15,21 +21,15 @@
     "A smooth following shot of a metal logistics crate moving along a straight automated conveyor, complex factory machinery in the background rushing past.",
     "A handheld following shot of a large metal ball rolling through a straight modern art gallery, surrounding artworks and viewers receding rapidly with parallax."
   ],
-  "nonrigid_nonhuman_bio": [
-    "A smooth following shot of a large eagle flying at high speed parallel to a cliff, rock face and sea below, clear sky.",
-    "A following shot from a moving boat of a dolphin swimming and leaping in the waves alongside, spray and sunlight.",
-    "A handheld shot of a large octopus swimming away in a complex coral reef, tentacles waving, colorful fish and coral, blue water and light shafts.",
-    "A backward-moving shot following a snake slithering through dense colorful flowers on the ground, petals and stems, soft daylight.",
-    "A moving shot following a peacock walking and shaking its tail feathers in a palace garden, fountains and trimmed hedges, ornate tiles."
+  "Longitudinal_Convergence": [
+    "A handheld following shot of a red vintage car driving away on a straight desert highway, harsh noon light and heat haze on the horizon, subtle shake and lateral drift.",
+    "A high-speed train moving toward the viewer on a straight track, low-angle handheld perspective, rails and gravel receding toward a clear vanishing point.",
+    "A yellow school bus driving away on a straight tree-lined suburban street, the shot tracking from a low position behind, morning light and clean asphalt.",
+    "A silver metallic sphere rolling away on a long reflective marble floor in a bright gallery, the shot following closely with slight sway.",
+    "A heavy cargo truck moving away on a straight bridge at night, tail lights glowing, subtle frame shake, city lights in the distance.",
+    "A large shipping container being pushed away on a straight industrial dock, cranes and water behind, moving viewpoint, overcast industrial light."
   ],
-  "orbital_rotation": [
-    "A handheld tracking perspective follows a silver compact SUV navigating a sharp hairpin turn on a winding mountain road. The view orbits slightly to capture the vehicle transitioning from a front-view to a side-view against the pine forest background.",
-    "A low-angle shot follows a sports car drifting through a 90-degree corner on a professional race track. The car rotates intensely while the moving shot emphasizes the shifting vanishing lines of the curb and tire marks.",
-    "A cinematic tracking shot follows a city bus driving through a large, ornate stone roundabout. The view maintains a side perspective, showing the bus constantly changing its orientation relative to the central fountain and surrounding city traffic.",
-    "A ground-level perspective tracking a small delivery robot as it makes a sharp turn at a sidewalk corner. The shot stays close, highlighting the rotation of the robot's boxy frame against the detailed brickwork.",
-    "A handheld shot follows a green tractor making a wide turn at the edge of a plowed field. The view moves with the vehicle, capturing the shifting angles of the heavy wheels and mechanical parts against the vast landscape."
-  ],
-  "partial_occlusion": [
+  "Partial_Occlusion": [
     "A car driving along a street at night, wheels briefly obscured by a low roadside guardrail for under a second, handheld shot moving alongside, street lamps and storefronts.",
     "A train passing behind a row of thin vertical power line poles, the shot tracking its movement from a moving platform, sky and industrial landscape.",
     "A bus moving through a city street, briefly partially hidden by a thin traffic sign, the shot following from the sidewalk.",

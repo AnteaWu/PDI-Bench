@@ -8,7 +8,7 @@ from rich.table import Table
 console = Console()
 
 class PDILogger:
-    """Rich 风格的 PDI-Eval 专用日志记录器"""
+    """Rich-styled logger for PDI-Eval."""
     def __init__(self):
         logging.basicConfig(
             level="INFO",
@@ -22,16 +22,16 @@ class PDILogger:
         self.log.info(msg)
 
     def success(self, msg: str):
-        self.log.info(f"[bold green]✔ {msg}[/bold green]")
+        self.log.info(f"[bold green][OK] {msg}[/bold green]")
 
     def warning(self, msg: str):
         self.log.warning(f"[yellow]{msg}[/yellow]")
 
     def error(self, msg: str):
-        self.log.error(f"[bold red]✘ {msg}[/bold red]")
+        self.log.error(f"[bold red][ERR] {msg}[/bold red]")
 
     def pdi_report(self, report: dict):
-        """打印最终的审计等级报告"""
+        """Print final audit summary table."""
         table = Table(title="[bold blue]PDI-Eval Final Audit Report[/bold blue]")
         table.add_column("Indicator", justify="right", style="cyan")
         table.add_column("Value", justify="left", style="magenta")
@@ -41,7 +41,7 @@ class PDILogger:
         table.add_section()
         
         for k, v in report['breakdown'].items():
-            # 仅打印标量值，不打印序列历史
+            # Only scalar values; skip sequence histories
             if isinstance(v, (float, int)) or (isinstance(v, np.ndarray) and v.size == 1):
                 table.add_row(f"{k}", str(v))
             
