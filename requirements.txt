@@ -1,0 +1,33 @@
+# --- Core deep learning environment (pinned for reproducibility, CUDA 11.8) ---
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch==2.1.0
+torchvision==0.16.0
+torchaudio==2.1.0
+
+# --- Perception model interfaces ---
+# transformers must be pinned to 4.41.2 for compatibility with torch 2.1.0
+transformers==4.41.2
+timm==0.9.16
+einops==0.8.0
+huggingface_hub>=0.30.0
+
+# --- Geometry and 3D processing (required by Mega-SAM) ---
+# NOTE: torch-scatter must be installed separately; see README section 4.3
+kornia==0.7.4
+scikit-learn
+open3d
+ninja
+
+# --- Image and video I/O ---
+opencv-python>=4.8.0
+imageio==2.36.0
+decord==0.6.0
+pillow>=10.0.0
+
+# --- Utilities and visualization ---
+numpy==1.26.4
+scipy==1.14.1
+matplotlib
+tqdm
+pyyaml
+rich

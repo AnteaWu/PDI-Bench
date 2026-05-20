@@ -97,6 +97,8 @@ export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 pip install -r requirements.txt
 ```
 
+> **Note**: `torch-scatter` and `SAM2`/`Co-Tracker` are **not** in `requirements.txt` and must be installed separately in sections 4.2 and 4.3 below.
+
 ### 4.2 Install SAM2 and Co-Tracker
 
 ```bash
