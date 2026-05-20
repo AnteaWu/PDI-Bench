@@ -84,7 +84,6 @@ data/1s.mp4
 /README111.md
 /reconstruction_audit.py
 /render_pointcloud_views.py
-/requirements.txt
 /run_cotracker_object_only.py
 /sam2_check.py
 /sam2_preview.mp4
