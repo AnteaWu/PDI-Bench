@@ -147,9 +147,10 @@ Download the following checkpoint files into the corresponding directories:
 ```bash
 mkdir -p checkpoints/sam2
 wget -P checkpoints/sam2 https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_large.pt
-```
 
-> The `sam2_hiera_l.yaml` config file is included in the SAM2 package. The default path is `checkpoints/sam2/sam2_hiera_l.yaml`.
+# Copy the config file from the installed SAM2 package
+python -c "import shutil, sam2; import os; shutil.copy(os.path.join(os.path.dirname(sam2.__file__), 'configs/sam2/sam2_hiera_l.yaml'), 'checkpoints/sam2/sam2_hiera_l.yaml')"
+```
 
 ### Co-Tracker (CoTracker3 Offline)
 ```bash
