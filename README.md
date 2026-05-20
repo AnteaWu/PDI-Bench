@@ -81,8 +81,8 @@ export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 This project includes nested submodules: `third_party/mega_sam` itself depends on `third_party/mega_sam/base` (the DROID-SLAM core).
 
 ```bash
-git clone --recursive https://github.com/JiaxinWu-25/PDI-Eval.git
-cd PDI-Eval
+git clone --recursive https://github.com/AnteaWu/PDI-Bench.git
+cd PDI-Bench
 
 # If the main repo is already cloned, initialize submodules recursively (including nested ones)
 git submodule update --init --recursive
