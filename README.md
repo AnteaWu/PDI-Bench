@@ -42,6 +42,15 @@ This project is highly sensitive to CUDA versions. **You must strictly follow th
 - **Python**: 3.10
 - **CUDA Toolkit**: 11.8
 - **PyTorch**: 2.1.0
+- **Conda environment name**: `pdi-bench`
+
+Do **not** rely on a system-wide CUDA installation such as `/usr/local/cuda-12.x` or `/usr/local/cuda-13.x`. PDI-Bench should use the CUDA 11.8 toolkit installed inside the conda environment. If your shell startup file (`~/.bashrc`, `~/.zshrc`, etc.) contains a line like the following, remove it or comment it out before continuing:
+
+```bash
+export CUDA_HOME=/usr/local/cuda-13.0
+```
+
+Also do **not** create the environment from `third_party/mega_sam/environment.yml` or install `third_party/mega_sam/UniDepth/requirements.txt` directly. Those upstream files pin different PyTorch/CUDA versions and can overwrite the version combination above.
 
 ---
 
@@ -64,8 +73,8 @@ git submodule update --init --recursive
 ### 3.1 Create a Conda Environment
 
 ```bash
-conda create -n pdi_bench python=3.10 -y
-conda activate pdi_bench
+conda create -n pdi-bench python=3.10 -y
+conda activate pdi-bench
 
 # Install basic build tools
 conda install -c conda-forge gxx_linux-64=11 gcc_linux-64=11 cmake -y
@@ -73,19 +82,37 @@ conda install -c conda-forge gxx_linux-64=11 gcc_linux-64=11 cmake -y
 # Install PyTorch (you must specify `index-url`)
 pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu118
 
-# Install CUDA toolkit and ensure `nvcc` matches cu118
-conda install -c nvidia cuda-toolkit=11.8 -y
+# Install the CUDA 11.8 build toolkit inside this conda environment
+conda install -c nvidia cuda-nvcc=11.8 cuda-cccl=11.8 cuda-libraries-dev=11.8 cuda-cudart-dev=11.8 libcublas-dev=11.11 -y
 ```
 
-### 3.2 Set Environment Variables
+### 3.2 Configure CUDA for This Conda Environment
 
 ```bash
-export CUDA_HOME=$CONDA_PREFIX
-export PATH=$CUDA_HOME/bin:$PATH
-export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+mkdir -p "$CONDA_PREFIX/etc/conda/activate.d"
+cat > "$CONDA_PREFIX/etc/conda/activate.d/pdi_bench_cuda.sh" <<'EOF'
+export CUDA_HOME="$CONDA_PREFIX"
+export PATH="$CUDA_HOME/bin:$PATH"
+export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$CONDA_PREFIX/lib/python3.10/site-packages/torch/lib:${LD_LIBRARY_PATH:-}"
+EOF
+
+conda deactivate
+conda activate pdi-bench
 ```
 
-> It is recommended to add the three lines above to `~/.bashrc` or `~/.zshrc` for persistence.
+Verify that PyTorch and `nvcc` both use CUDA 11.8 from the active conda environment:
+
+```bash
+python -c "import os, torch; print('torch:', torch.__version__); print('torch CUDA:', torch.version.cuda); print('CUDA_HOME:', os.environ.get('CUDA_HOME'))"
+which nvcc
+nvcc --version
+```
+
+Expected results:
+
+- `torch CUDA` should be `11.8`.
+- `CUDA_HOME` should point to the active conda environment, not `/usr/local/cuda-*`.
+- `which nvcc` should point to `$CONDA_PREFIX/bin/nvcc`.
 
 ---
 
@@ -99,12 +126,22 @@ pip install -r requirements.txt
 
 > **Note**: `torch-scatter` and `SAM2`/`Co-Tracker` are **not** in `requirements.txt` and must be installed separately in sections 4.2 and 4.3 below.
 
+Install the additional runtime packages used by Mega-SAM and UniDepth without changing the pinned PyTorch/CUDA stack:
+
+```bash
+pip install wandb yacs h5py safetensors tabulate
+pip install xformers==0.0.22.post7 --no-deps
+```
+
 ### 4.2 Install SAM2 and Co-Tracker
 
 ```bash
-pip install git+https://github.com/facebookresearch/segment-anything-2.git
-pip install git+https://github.com/facebookresearch/co-tracker.git
+pip install hydra-core iopath
+pip install --no-deps git+https://github.com/facebookresearch/segment-anything-2.git
+pip install --no-deps git+https://github.com/facebookresearch/co-tracker.git
 ```
+
+> **Important**: `--no-deps` prevents these packages from upgrading the pinned PyTorch/CUDA stack. Do not follow external install instructions that install or upgrade CUDA packages for SAM2 or Co-Tracker.
 
 ### 4.3 Install `torch-scatter` (must force the pt21 build)
 
@@ -119,11 +156,18 @@ Verify installation:
 python -c "from torch_scatter import scatter_sum; print('torch_scatter OK')"
 ```
 
+Verify the main runtime packages:
+
+```bash
+PYTHONPATH=third_party/mega_sam/UniDepth python -c "import sam2, xformers; from cotracker.predictor import CoTrackerPredictor; from unidepth.models import UniDepthV2; print('SAM2 / CoTracker / UniDepth OK')"
+```
+
 ### 4.4 Compile Mega-SAM Low-Level Operators
 
 The DROID-SLAM core of Mega-SAM depends on two CUDA C++ extensions: `droid_backends` and `lietorch`. Run the provided build script from the **project root**:
 
 ```bash
+conda activate pdi-bench
 bash scripts/build_mega_sam.sh
 ```
 
@@ -171,6 +215,12 @@ mkdir -p third_party/mega_sam/checkpoints
 # Get this file from the official Mega-SAM repository: https://github.com/mega-sam/mega-sam
 ```
 
+After downloading, the file must exist at:
+
+```bash
+test -f third_party/mega_sam/checkpoints/megasam_final.pth && echo "megasam_final.pth OK"
+```
+
 ### Mega-SAM: RAFT (required for CVD-consistent depth optimization)
 
 > RAFT is required in Step 4 of the full MegaSAM pipeline (CVD pre-flow). If missing, the pipeline will automatically fall back to raw DROID depth, but temporal depth consistency will degrade.
@@ -183,6 +233,12 @@ cd ../../../
 ```
 
 Weight paths are configured in `configs/default.yaml` and can be edited as needed.
+
+Verify all required checkpoint files:
+
+```bash
+test -f checkpoints/sam2/sam2_hiera_large.pt && test -f checkpoints/sam2/sam2_hiera_l.yaml && test -f checkpoints/tracker/scaled_offline.pth && test -f third_party/mega_sam/Depth-Anything/checkpoints/depth_anything_vitl14.pth && test -f third_party/mega_sam/checkpoints/megasam_final.pth && echo "Required checkpoints OK"
+```
 
 ---
 
@@ -242,13 +298,15 @@ snapshot_download(
 ### Specify Target by Text (recommended, fully automatic)
 
 ```bash
+conda activate pdi-bench
 python evaluation/main.py --input your_video.mp4 --text "train"
 ```
 
 ### Specify Target with Manual Coordinates
 
 ```bash
-python evaluation/main.py --input your_video.mp4 --text "your_video"
+conda activate pdi-bench
+python evaluation/main.py --input your_video.mp4 --points '[[500, 500]]'
 ```
 
 ### Full Argument Reference

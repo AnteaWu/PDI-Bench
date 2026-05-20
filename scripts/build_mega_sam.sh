@@ -4,6 +4,36 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$SCRIPT_DIR/../third_party/mega_sam/base"
 
+if [ -z "${CONDA_PREFIX:-}" ]; then
+    echo "ERROR: Please activate the conda environment first, for example: conda activate pdi-bench"
+    exit 1
+fi
+
+export CUDA_HOME="$CONDA_PREFIX"
+export PATH="$CUDA_HOME/bin:$PATH"
+export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$CONDA_PREFIX/lib/python3.10/site-packages/torch/lib:${LD_LIBRARY_PATH:-}"
+export CPATH="$CUDA_HOME/include:${CPATH:-}"
+export CPLUS_INCLUDE_PATH="$CUDA_HOME/include:${CPLUS_INCLUDE_PATH:-}"
+
+if ! command -v nvcc >/dev/null 2>&1; then
+    echo "ERROR: nvcc not found. Install CUDA 11.8 toolkit with conda before building."
+    exit 1
+fi
+
+CUDA_VERSION="$(nvcc --version | sed -n 's/.*release \([0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | head -n 1)"
+if [ "$CUDA_VERSION" != "11.8" ]; then
+    echo "ERROR: Expected CUDA 11.8 from the conda environment, but nvcc reports CUDA $CUDA_VERSION"
+    echo "CUDA_HOME=$CUDA_HOME"
+    echo "nvcc=$(command -v nvcc)"
+    exit 1
+fi
+
+TORCH_CUDA_VERSION="$(python -c "import torch; print(torch.version.cuda)")"
+if [ "$TORCH_CUDA_VERSION" != "11.8" ]; then
+    echo "ERROR: Expected PyTorch cu118, but torch.version.cuda is $TORCH_CUDA_VERSION"
+    exit 1
+fi
+
 if [ ! -d "$BASE_DIR" ]; then
     echo "ERROR: $BASE_DIR not found. Did you run: git submodule update --init --recursive ?"
     exit 1
