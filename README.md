@@ -29,7 +29,7 @@
 The **Perspective Distortion Index (PDI)** is defined as a weighted sum of three orthogonal residuals:
 
 $$
-\text{PDI} = w_1 \cdot \operatorname{RMSE}(\epsilon_{scale}) + w_2 \cdot \operatorname{RMSE}(\epsilon_{traj}) + w_3 \cdot \epsilon_{rigidity}
+\text{PDI} = w_1 \cdot \mathrm{RMSE}(\epsilon_{scale}) + w_2 \cdot \mathrm{RMSE}(\epsilon_{traj}) + w_3 \cdot \epsilon_{rigidity}
 $$
 
 where $\sum_{i=1}^{3} w_i = 1$. Each component is designed to be scale-invariant and to capture a geometrically orthogonal failure mode.
