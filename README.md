@@ -2,6 +2,11 @@
 
 **PDI-Bench** is an automated evaluation framework designed to quantify **spatial scale and perspective consistency** in AI video generation models (such as Sora, Seedance, Flow). By integrating **SAM2**, **Co-Tracker**, and **Mega-SAM**, this project builds a physical-audit pipeline from 2D pixel tracking to 3D geometric reconstruction.
 
+![Demo Preview](figures/bus_hero.gif)
+---
+![Pipeline](figures/pipeline.png)
+## Core Evaluation Logic
+
 ---
 
 ## Core Evaluation Logic
@@ -179,7 +184,58 @@ Weight paths are configured in `configs/default.yaml` and can be edited as neede
 
 ---
 
-## 6. Quick Start
+## 6. Download Dataset
+
+The benchmark videos are hosted on Hugging Face: [AnteaWu/PDI-Dataset](https://huggingface.co/datasets/AnteaWu/PDI-Dataset).
+
+### Install Hugging Face Hub CLI
+
+```bash
+pip install huggingface_hub
+```
+
+### Download Ground Truth Videos Only (Recommended)
+
+```bash
+python -c "
+from huggingface_hub import snapshot_download
+snapshot_download(
+    repo_id='AnteaWu/PDI-Dataset',
+    repo_type='dataset',
+    allow_patterns='GT/**',
+    local_dir='videos'
+)
+"
+```
+
+After downloading, the GT videos will be placed under `videos/GT/`, structured as:
+
+```
+videos/
+  GT/
+    Biological_Motion/
+    Curved_Motion/
+    Dynamic_Tracking/
+    Longitudinal_Convergence/
+    Partial_Occlusion/
+```
+
+### Download All Videos (GT + Generated)
+
+```bash
+python -c "
+from huggingface_hub import snapshot_download
+snapshot_download(
+    repo_id='AnteaWu/PDI-Dataset',
+    repo_type='dataset',
+    local_dir='videos'
+)
+"
+```
+
+---
+
+## 7. Quick Start
 
 ### Specify Target by Text (recommended, fully automatic)
 
