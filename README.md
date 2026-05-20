@@ -3,9 +3,8 @@
 **PDI-Bench** is an automated evaluation framework designed to quantify **spatial scale and perspective consistency** in AI video generation models (such as Sora, Seedance, Flow). By integrating **SAM2**, **Co-Tracker**, and **Mega-SAM**, this project builds a physical-audit pipeline from 2D pixel tracking to 3D geometric reconstruction.
 
 ![Demo Preview](figures/bus_hero.gif)
----
+
 ![Pipeline](figures/pipeline.png)
-## Core Evaluation Logic
 
 ---
 
@@ -46,13 +45,27 @@ This project is highly sensitive to CUDA versions. **You must strictly follow th
 
 ---
 
-## 2. Environment Setup
+## 2. Clone the Project and Submodules
 
-### 2.1 Create a Conda Environment
+This project includes nested submodules: `third_party/mega_sam` itself depends on `third_party/mega_sam/base` (the DROID-SLAM core).
 
 ```bash
-conda create -n pdi_eval python=3.10 -y
-conda activate pdi_eval
+git clone --recursive https://github.com/AnteaWu/PDI-Bench.git
+cd PDI-Bench
+
+# If the main repo is already cloned, initialize submodules recursively (including nested ones)
+git submodule update --init --recursive
+```
+
+---
+
+## 3. Environment Setup
+
+### 3.1 Create a Conda Environment
+
+```bash
+conda create -n pdi_bench python=3.10 -y
+conda activate pdi_bench
 
 # Install basic build tools
 conda install -c conda-forge gxx_linux-64=11 gcc_linux-64=11 cmake -y
@@ -64,7 +77,7 @@ pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https
 conda install -c nvidia cuda-toolkit=11.8 -y
 ```
 
-### 2.2 Set Environment Variables
+### 3.2 Set Environment Variables
 
 ```bash
 export CUDA_HOME=$CONDA_PREFIX
@@ -73,20 +86,6 @@ export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 ```
 
 > It is recommended to add the three lines above to `~/.bashrc` or `~/.zshrc` for persistence.
-
----
-
-## 3. Clone the Project and Submodules
-
-This project includes nested submodules: `third_party/mega_sam` itself depends on `third_party/mega_sam/base` (the DROID-SLAM core).
-
-```bash
-git clone --recursive https://github.com/AnteaWu/PDI-Bench.git
-cd PDI-Bench
-
-# If the main repo is already cloned, initialize submodules recursively (including nested ones)
-git submodule update --init --recursive
-```
 
 ---
 
@@ -240,13 +239,13 @@ snapshot_download(
 ### Specify Target by Text (recommended, fully automatic)
 
 ```bash
-python evaluation/main.py --input data/your_video.mp4 --text "train"
+python evaluation/main.py --input your_video.mp4 --text "train"
 ```
 
 ### Specify Target with Manual Coordinates
 
 ```bash
-python evaluation/main.py --input data/your_video.mp4 --text "your_video"
+python evaluation/main.py --input your_video.mp4 --text "your_video"
 ```
 
 ### Full Argument Reference
